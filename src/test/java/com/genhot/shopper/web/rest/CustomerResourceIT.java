@@ -8,7 +8,6 @@ import com.genhot.shopper.IntegrationTest;
 import com.genhot.shopper.domain.Customer;
 import com.genhot.shopper.repository.CustomerRepository;
 import com.genhot.shopper.repository.EntityManager;
-import java.time.Duration;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;

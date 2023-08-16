@@ -1,6 +1,5 @@
 package com.genhot.shopper;
 
-import com.genhot.shopper.ShopperApp;
 import com.genhot.shopper.config.AsyncSyncConfiguration;
 import com.genhot.shopper.config.EmbeddedSQL;
 import java.lang.annotation.ElementType;

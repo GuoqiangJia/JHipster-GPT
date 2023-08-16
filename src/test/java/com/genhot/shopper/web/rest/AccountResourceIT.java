@@ -12,7 +12,6 @@ import com.genhot.shopper.security.AuthoritiesConstants;
 import com.genhot.shopper.service.UserService;
 import com.genhot.shopper.service.dto.AdminUserDTO;
 import com.genhot.shopper.service.dto.PasswordChangeDTO;
-import com.genhot.shopper.service.dto.UserDTO;
 import com.genhot.shopper.web.rest.vm.KeyAndPasswordVM;
 import com.genhot.shopper.web.rest.vm.ManagedUserVM;
 import java.time.Instant;

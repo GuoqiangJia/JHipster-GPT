@@ -8,7 +8,6 @@ import com.genhot.shopper.IntegrationTest;
 import com.genhot.shopper.domain.Delivery;
 import com.genhot.shopper.repository.DeliveryRepository;
 import com.genhot.shopper.repository.EntityManager;
-import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;

@@ -3,7 +3,6 @@ package com.genhot.shopper.web.rest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.genhot.shopper.IntegrationTest;
-import com.genhot.shopper.config.Constants;
 import com.genhot.shopper.domain.User;
 import com.genhot.shopper.repository.EntityManager;
 import com.genhot.shopper.repository.UserRepository;

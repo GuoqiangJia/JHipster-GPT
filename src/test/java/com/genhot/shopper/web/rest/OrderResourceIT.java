@@ -10,7 +10,6 @@ import com.genhot.shopper.domain.Order;
 import com.genhot.shopper.repository.EntityManager;
 import com.genhot.shopper.repository.OrderRepository;
 import java.math.BigDecimal;
-import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;

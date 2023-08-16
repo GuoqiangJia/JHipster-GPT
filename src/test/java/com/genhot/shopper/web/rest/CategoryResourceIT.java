@@ -9,7 +9,6 @@ import com.genhot.shopper.domain.Category;
 import com.genhot.shopper.domain.enumeration.CategoryStatus;
 import com.genhot.shopper.repository.CategoryRepository;
 import com.genhot.shopper.repository.EntityManager;
-import java.time.Duration;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;

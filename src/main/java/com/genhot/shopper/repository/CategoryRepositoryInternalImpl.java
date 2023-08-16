@@ -1,26 +1,15 @@
 package com.genhot.shopper.repository;
 
-import static org.springframework.data.relational.core.query.Criteria.where;
-
 import com.genhot.shopper.domain.Category;
-import com.genhot.shopper.domain.enumeration.CategoryStatus;
 import com.genhot.shopper.repository.rowmapper.CategoryRowMapper;
 import io.r2dbc.spi.Row;
 import io.r2dbc.spi.RowMetadata;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.function.BiFunction;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.r2dbc.convert.R2dbcConverter;
 import org.springframework.data.r2dbc.core.R2dbcEntityOperations;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.data.r2dbc.repository.support.SimpleR2dbcRepository;
-import org.springframework.data.relational.core.query.Criteria;
-import org.springframework.data.relational.core.sql.Column;
 import org.springframework.data.relational.core.sql.Comparison;
 import org.springframework.data.relational.core.sql.Condition;
 import org.springframework.data.relational.core.sql.Conditions;
