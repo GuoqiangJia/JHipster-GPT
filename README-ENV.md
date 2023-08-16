@@ -23,7 +23,8 @@ https://git-scm.com/download/win
 ## 准备生产环境数据库（postgresql）
 从以下链接下载数据库且安装：
 
-https://www.enterprisedb.com/postgresql-tutorial-resources-training-1?uuid=c70fc67b-ca1f-4dc2-b73b-ccb7367fb6b8&campaignId=Product_Trial_PostgreSQL_15                         
+https://www.enterprisedb.com/postgresql-tutorial-resources-training-1?uuid=c70fc67b-ca1f-4dc2-b73b-ccb7367fb6b8&campaignId=Product_Trial_PostgreSQL_15
+安装完成后，可以在pgAdmin客户端测试数据库是否正确安装                         
 
 # 安装Jhipster 
 在Terminal中运行以下命令：
