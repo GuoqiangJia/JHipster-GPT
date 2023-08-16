@@ -1,0 +1,27 @@
+{
+  "shopperApp": {
+    "delivery": {
+      "home": {
+        "title": "Deliveries",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "创建新 Delivery",
+        "createOrEditLabel": "创建或编辑 Delivery",
+        "notFound": "No Deliveries found"
+      },
+      "created": "Delivery {{ param }} 创建成功",
+      "updated": "Delivery {{ param }} 更新成功",
+      "deleted": "Delivery {{ param }} 删除成功",
+      "delete": {
+        "question": "你确定要删除 Delivery {{ id }} 吗？"
+      },
+      "detail": {
+        "title": "Delivery"
+      },
+      "id": "ID",
+      "trackingNumber": "Tracking Number",
+      "carrier": "Carrier",
+      "shippingDate": "Shipping Date",
+      "order": "Order"
+    }
+  }
+}
