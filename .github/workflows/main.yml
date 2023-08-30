@@ -1,5 +1,6 @@
 name: Application CI
 on: [push, pull_request]
+
 jobs:
   pipeline:
     name: shopper pipeline
