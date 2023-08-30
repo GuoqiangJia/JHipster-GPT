@@ -8,9 +8,7 @@ jobs:
     timeout-minutes: 40
     env:
       NODE_VERSION: 18.16.1
-      SPRING_OUTPUT_ANSI_ENABLED: DETECT
       SPRING_JPA_SHOW_SQL: false
-      NG_CLI_ANALYTICS: false
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
