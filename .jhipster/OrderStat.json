@@ -1,0 +1,31 @@
+{
+  "changelogDate": "20230828065832",
+  "fields": [
+    {
+      "fieldName": "firstName",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "lastName",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "totalCost",
+      "fieldType": "BigDecimal"
+    },
+    {
+      "fieldName": "type",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "email",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "name": "OrderStat",
+  "pagination": "pagination",
+  "readOnly": true,
+  "relationships": [],
+  "skipServer": true
+}

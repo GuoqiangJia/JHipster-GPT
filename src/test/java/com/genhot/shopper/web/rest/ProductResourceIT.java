@@ -1,6 +1,5 @@
 package com.genhot.shopper.web.rest;
 
-import static com.genhot.shopper.web.rest.TestUtil.sameNumber;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
@@ -10,7 +9,9 @@ import com.genhot.shopper.IntegrationTest;
 import com.genhot.shopper.domain.Product;
 import com.genhot.shopper.repository.EntityManager;
 import com.genhot.shopper.repository.ProductRepository;
-import java.math.BigDecimal;
+import com.genhot.shopper.service.ProductService;
+import com.genhot.shopper.service.dto.ProductDTO;
+import com.genhot.shopper.service.mapper.ProductMapper;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
@@ -42,8 +43,8 @@ class ProductResourceIT {
     private static final String DEFAULT_DESCRIPTION = "AAAAAAAAAA";
     private static final String UPDATED_DESCRIPTION = "BBBBBBBBBB";
 
-    private static final BigDecimal DEFAULT_PRICE = new BigDecimal(1);
-    private static final BigDecimal UPDATED_PRICE = new BigDecimal(2);
+    private static final Double DEFAULT_PRICE = 1D;
+    private static final Double UPDATED_PRICE = 2D;
 
     private static final Integer DEFAULT_INVENTORY = 1;
     private static final Integer UPDATED_INVENTORY = 2;
@@ -59,6 +60,12 @@ class ProductResourceIT {
 
     @Mock
     private ProductRepository productRepositoryMock;
+
+    @Autowired
+    private ProductMapper productMapper;
+
+    @Mock
+    private ProductService productServiceMock;
 
     @Autowired
     private EntityManager em;
@@ -100,7 +107,7 @@ class ProductResourceIT {
 
     public static void deleteEntities(EntityManager em) {
         try {
-            em.deleteAll("rel_product__category").block();
+            em.deleteAll("rel_product__categories").block();
             em.deleteAll(Product.class).block();
         } catch (Exception e) {
             // It can fail, if other entities are still referring this - it will be removed later.
@@ -122,11 +129,12 @@ class ProductResourceIT {
     void createProduct() throws Exception {
         int databaseSizeBeforeCreate = productRepository.findAll().collectList().block().size();
         // Create the Product
+        ProductDTO productDTO = productMapper.toDto(product);
         webTestClient
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(product))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(productDTO))
             .exchange()
             .expectStatus()
             .isCreated();
@@ -137,7 +145,7 @@ class ProductResourceIT {
         Product testProduct = productList.get(productList.size() - 1);
         assertThat(testProduct.getName()).isEqualTo(DEFAULT_NAME);
         assertThat(testProduct.getDescription()).isEqualTo(DEFAULT_DESCRIPTION);
-        assertThat(testProduct.getPrice()).isEqualByComparingTo(DEFAULT_PRICE);
+        assertThat(testProduct.getPrice()).isEqualTo(DEFAULT_PRICE);
         assertThat(testProduct.getInventory()).isEqualTo(DEFAULT_INVENTORY);
     }
 
@@ -145,6 +153,7 @@ class ProductResourceIT {
     void createProductWithExistingId() throws Exception {
         // Create the Product with an existing ID
         product.setId(1L);
+        ProductDTO productDTO = productMapper.toDto(product);
 
         int databaseSizeBeforeCreate = productRepository.findAll().collectList().block().size();
 
@@ -153,7 +162,7 @@ class ProductResourceIT {
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(product))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(productDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -170,12 +179,13 @@ class ProductResourceIT {
         product.setName(null);
 
         // Create the Product, which fails.
+        ProductDTO productDTO = productMapper.toDto(product);
 
         webTestClient
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(product))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(productDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -191,12 +201,13 @@ class ProductResourceIT {
         product.setPrice(null);
 
         // Create the Product, which fails.
+        ProductDTO productDTO = productMapper.toDto(product);
 
         webTestClient
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(product))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(productDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -212,12 +223,13 @@ class ProductResourceIT {
         product.setInventory(null);
 
         // Create the Product, which fails.
+        ProductDTO productDTO = productMapper.toDto(product);
 
         webTestClient
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(product))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(productDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -249,23 +261,23 @@ class ProductResourceIT {
             .jsonPath("$.[*].description")
             .value(hasItem(DEFAULT_DESCRIPTION))
             .jsonPath("$.[*].price")
-            .value(hasItem(sameNumber(DEFAULT_PRICE)))
+            .value(hasItem(DEFAULT_PRICE.doubleValue()))
             .jsonPath("$.[*].inventory")
             .value(hasItem(DEFAULT_INVENTORY));
     }
 
     @SuppressWarnings({ "unchecked" })
     void getAllProductsWithEagerRelationshipsIsEnabled() {
-        when(productRepositoryMock.findAllWithEagerRelationships(any())).thenReturn(Flux.empty());
+        when(productServiceMock.findAllWithEagerRelationships(any())).thenReturn(Flux.empty());
 
         webTestClient.get().uri(ENTITY_API_URL + "?eagerload=true").exchange().expectStatus().isOk();
 
-        verify(productRepositoryMock, times(1)).findAllWithEagerRelationships(any());
+        verify(productServiceMock, times(1)).findAllWithEagerRelationships(any());
     }
 
     @SuppressWarnings({ "unchecked" })
     void getAllProductsWithEagerRelationshipsIsNotEnabled() {
-        when(productRepositoryMock.findAllWithEagerRelationships(any())).thenReturn(Flux.empty());
+        when(productServiceMock.findAllWithEagerRelationships(any())).thenReturn(Flux.empty());
 
         webTestClient.get().uri(ENTITY_API_URL + "?eagerload=false").exchange().expectStatus().isOk();
         verify(productRepositoryMock, times(1)).findAllWithEagerRelationships(any());
@@ -294,7 +306,7 @@ class ProductResourceIT {
             .jsonPath("$.description")
             .value(is(DEFAULT_DESCRIPTION))
             .jsonPath("$.price")
-            .value(is(sameNumber(DEFAULT_PRICE)))
+            .value(is(DEFAULT_PRICE.doubleValue()))
             .jsonPath("$.inventory")
             .value(is(DEFAULT_INVENTORY));
     }
@@ -321,12 +333,13 @@ class ProductResourceIT {
         // Update the product
         Product updatedProduct = productRepository.findById(product.getId()).block();
         updatedProduct.name(UPDATED_NAME).description(UPDATED_DESCRIPTION).price(UPDATED_PRICE).inventory(UPDATED_INVENTORY);
+        ProductDTO productDTO = productMapper.toDto(updatedProduct);
 
         webTestClient
             .put()
-            .uri(ENTITY_API_URL_ID, updatedProduct.getId())
+            .uri(ENTITY_API_URL_ID, productDTO.getId())
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(updatedProduct))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(productDTO))
             .exchange()
             .expectStatus()
             .isOk();
@@ -337,7 +350,7 @@ class ProductResourceIT {
         Product testProduct = productList.get(productList.size() - 1);
         assertThat(testProduct.getName()).isEqualTo(UPDATED_NAME);
         assertThat(testProduct.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
-        assertThat(testProduct.getPrice()).isEqualByComparingTo(UPDATED_PRICE);
+        assertThat(testProduct.getPrice()).isEqualTo(UPDATED_PRICE);
         assertThat(testProduct.getInventory()).isEqualTo(UPDATED_INVENTORY);
     }
 
@@ -346,12 +359,15 @@ class ProductResourceIT {
         int databaseSizeBeforeUpdate = productRepository.findAll().collectList().block().size();
         product.setId(count.incrementAndGet());
 
+        // Create the Product
+        ProductDTO productDTO = productMapper.toDto(product);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         webTestClient
             .put()
-            .uri(ENTITY_API_URL_ID, product.getId())
+            .uri(ENTITY_API_URL_ID, productDTO.getId())
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(product))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(productDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -366,12 +382,15 @@ class ProductResourceIT {
         int databaseSizeBeforeUpdate = productRepository.findAll().collectList().block().size();
         product.setId(count.incrementAndGet());
 
+        // Create the Product
+        ProductDTO productDTO = productMapper.toDto(product);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .put()
             .uri(ENTITY_API_URL_ID, count.incrementAndGet())
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(product))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(productDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -386,12 +405,15 @@ class ProductResourceIT {
         int databaseSizeBeforeUpdate = productRepository.findAll().collectList().block().size();
         product.setId(count.incrementAndGet());
 
+        // Create the Product
+        ProductDTO productDTO = productMapper.toDto(product);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .put()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(product))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(productDTO))
             .exchange()
             .expectStatus()
             .isEqualTo(405);
@@ -429,7 +451,7 @@ class ProductResourceIT {
         Product testProduct = productList.get(productList.size() - 1);
         assertThat(testProduct.getName()).isEqualTo(UPDATED_NAME);
         assertThat(testProduct.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
-        assertThat(testProduct.getPrice()).isEqualByComparingTo(DEFAULT_PRICE);
+        assertThat(testProduct.getPrice()).isEqualTo(DEFAULT_PRICE);
         assertThat(testProduct.getInventory()).isEqualTo(UPDATED_INVENTORY);
     }
 
@@ -461,7 +483,7 @@ class ProductResourceIT {
         Product testProduct = productList.get(productList.size() - 1);
         assertThat(testProduct.getName()).isEqualTo(UPDATED_NAME);
         assertThat(testProduct.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
-        assertThat(testProduct.getPrice()).isEqualByComparingTo(UPDATED_PRICE);
+        assertThat(testProduct.getPrice()).isEqualTo(UPDATED_PRICE);
         assertThat(testProduct.getInventory()).isEqualTo(UPDATED_INVENTORY);
     }
 
@@ -470,12 +492,15 @@ class ProductResourceIT {
         int databaseSizeBeforeUpdate = productRepository.findAll().collectList().block().size();
         product.setId(count.incrementAndGet());
 
+        // Create the Product
+        ProductDTO productDTO = productMapper.toDto(product);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         webTestClient
             .patch()
-            .uri(ENTITY_API_URL_ID, product.getId())
+            .uri(ENTITY_API_URL_ID, productDTO.getId())
             .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(TestUtil.convertObjectToJsonBytes(product))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(productDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -490,12 +515,15 @@ class ProductResourceIT {
         int databaseSizeBeforeUpdate = productRepository.findAll().collectList().block().size();
         product.setId(count.incrementAndGet());
 
+        // Create the Product
+        ProductDTO productDTO = productMapper.toDto(product);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .patch()
             .uri(ENTITY_API_URL_ID, count.incrementAndGet())
             .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(TestUtil.convertObjectToJsonBytes(product))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(productDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -510,12 +538,15 @@ class ProductResourceIT {
         int databaseSizeBeforeUpdate = productRepository.findAll().collectList().block().size();
         product.setId(count.incrementAndGet());
 
+        // Create the Product
+        ProductDTO productDTO = productMapper.toDto(product);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .patch()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(TestUtil.convertObjectToJsonBytes(product))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(productDTO))
             .exchange()
             .expectStatus()
             .isEqualTo(405);

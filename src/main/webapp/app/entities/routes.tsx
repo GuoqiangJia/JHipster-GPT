@@ -9,6 +9,7 @@ import Customer from './customer';
 import Address from './address';
 import Order from './order';
 import Delivery from './delivery';
+import OrderStat from './order-stat';
 /* jhipster-needle-add-route-import - JHipster will add routes here */
 
 export default () => {
@@ -22,6 +23,7 @@ export default () => {
         <Route path="address/*" element={<Address />} />
         <Route path="order/*" element={<Order />} />
         <Route path="delivery/*" element={<Delivery />} />
+        <Route path="order-stat/*" element={<OrderStat />} />
         {/* jhipster-needle-add-route-path - JHipster will add routes here */}
       </ErrorBoundaryRoutes>
     </div>

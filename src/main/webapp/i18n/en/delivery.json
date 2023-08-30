@@ -21,7 +21,7 @@
       "trackingNumber": "Tracking Number",
       "carrier": "Carrier",
       "shippingDate": "Shipping Date",
-      "order": "Order"
+      "orders": "Orders"
     }
   }
 }

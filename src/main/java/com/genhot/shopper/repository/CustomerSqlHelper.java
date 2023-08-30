@@ -15,7 +15,6 @@ public class CustomerSqlHelper {
         columns.add(Column.aliased("last_name", table, columnPrefix + "_last_name"));
         columns.add(Column.aliased("email", table, columnPrefix + "_email"));
         columns.add(Column.aliased("phone_number", table, columnPrefix + "_phone_number"));
-        columns.add(Column.aliased("address", table, columnPrefix + "_address"));
 
         return columns;
     }

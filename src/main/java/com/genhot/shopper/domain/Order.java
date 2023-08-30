@@ -3,7 +3,6 @@ package com.genhot.shopper.domain;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
@@ -35,10 +34,10 @@ public class Order implements Serializable {
 
     @NotNull(message = "must not be null")
     @Column("total_price")
-    private BigDecimal totalPrice;
+    private Double totalPrice;
 
     @Transient
-    @JsonIgnoreProperties(value = { "categories", "order" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "categories", "orders" }, allowSetters = true)
     private Set<Product> products = new HashSet<>();
 
     @Transient
@@ -47,13 +46,13 @@ public class Order implements Serializable {
 
     @Transient
     @JsonIgnoreProperties(value = { "orders" }, allowSetters = true)
-    private Delivery delivery;
+    private Delivery deliveries;
 
     @Column("customer_id")
     private Long customerId;
 
-    @Column("delivery_id")
-    private Long deliveryId;
+    @Column("deliveries_id")
+    private Long deliveriesId;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -96,17 +95,17 @@ public class Order implements Serializable {
         this.status = status;
     }
 
-    public BigDecimal getTotalPrice() {
+    public Double getTotalPrice() {
         return this.totalPrice;
     }
 
-    public Order totalPrice(BigDecimal totalPrice) {
+    public Order totalPrice(Double totalPrice) {
         this.setTotalPrice(totalPrice);
         return this;
     }
 
-    public void setTotalPrice(BigDecimal totalPrice) {
-        this.totalPrice = totalPrice != null ? totalPrice.stripTrailingZeros() : null;
+    public void setTotalPrice(Double totalPrice) {
+        this.totalPrice = totalPrice;
     }
 
     public Set<Product> getProducts() {
@@ -115,10 +114,10 @@ public class Order implements Serializable {
 
     public void setProducts(Set<Product> products) {
         if (this.products != null) {
-            this.products.forEach(i -> i.setOrder(null));
+            this.products.forEach(i -> i.setOrders(null));
         }
         if (products != null) {
-            products.forEach(i -> i.setOrder(this));
+            products.forEach(i -> i.setOrders(this));
         }
         this.products = products;
     }
@@ -128,15 +127,15 @@ public class Order implements Serializable {
         return this;
     }
 
-    public Order addProduct(Product product) {
+    public Order addProducts(Product product) {
         this.products.add(product);
-        product.setOrder(this);
+        product.setOrders(this);
         return this;
     }
 
-    public Order removeProduct(Product product) {
+    public Order removeProducts(Product product) {
         this.products.remove(product);
-        product.setOrder(null);
+        product.setOrders(null);
         return this;
     }
 
@@ -154,17 +153,17 @@ public class Order implements Serializable {
         return this;
     }
 
-    public Delivery getDelivery() {
-        return this.delivery;
+    public Delivery getDeliveries() {
+        return this.deliveries;
     }
 
-    public void setDelivery(Delivery delivery) {
-        this.delivery = delivery;
-        this.deliveryId = delivery != null ? delivery.getId() : null;
+    public void setDeliveries(Delivery delivery) {
+        this.deliveries = delivery;
+        this.deliveriesId = delivery != null ? delivery.getId() : null;
     }
 
-    public Order delivery(Delivery delivery) {
-        this.setDelivery(delivery);
+    public Order deliveries(Delivery delivery) {
+        this.setDeliveries(delivery);
         return this;
     }
 
@@ -176,12 +175,12 @@ public class Order implements Serializable {
         this.customerId = customer;
     }
 
-    public Long getDeliveryId() {
-        return this.deliveryId;
+    public Long getDeliveriesId() {
+        return this.deliveriesId;
     }
 
-    public void setDeliveryId(Long delivery) {
-        this.deliveryId = delivery;
+    public void setDeliveriesId(Long delivery) {
+        this.deliveriesId = delivery;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here

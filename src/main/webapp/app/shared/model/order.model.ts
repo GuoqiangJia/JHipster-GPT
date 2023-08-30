@@ -10,7 +10,7 @@ export interface IOrder {
   totalPrice?: number;
   products?: IProduct[] | null;
   customer?: ICustomer | null;
-  delivery?: IDelivery | null;
+  deliveries?: IDelivery | null;
 }
 
 export const defaultValue: Readonly<IOrder> = {};

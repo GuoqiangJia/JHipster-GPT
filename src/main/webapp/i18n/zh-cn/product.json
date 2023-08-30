@@ -22,8 +22,8 @@
       "description": "Description",
       "price": "Price",
       "inventory": "Inventory",
-      "category": "Category",
-      "order": "Order"
+      "categories": "Categories",
+      "orders": "Orders"
     }
   }
 }

@@ -1,7 +1,8 @@
 package com.genhot.shopper.web.rest;
 
-import com.genhot.shopper.domain.Customer;
 import com.genhot.shopper.repository.CustomerRepository;
+import com.genhot.shopper.service.CustomerService;
+import com.genhot.shopper.service.dto.CustomerDTO;
 import com.genhot.shopper.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -18,7 +19,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -32,7 +32,6 @@ import tech.jhipster.web.util.reactive.ResponseUtil;
  */
 @RestController
 @RequestMapping("/api")
-@Transactional
 public class CustomerResource {
 
     private final Logger log = LoggerFactory.getLogger(CustomerResource.class);
@@ -42,27 +41,30 @@ public class CustomerResource {
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
+    private final CustomerService customerService;
+
     private final CustomerRepository customerRepository;
 
-    public CustomerResource(CustomerRepository customerRepository) {
+    public CustomerResource(CustomerService customerService, CustomerRepository customerRepository) {
+        this.customerService = customerService;
         this.customerRepository = customerRepository;
     }
 
     /**
      * {@code POST  /customers} : Create a new customer.
      *
-     * @param customer the customer to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new customer, or with status {@code 400 (Bad Request)} if the customer has already an ID.
+     * @param customerDTO the customerDTO to create.
+     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new customerDTO, or with status {@code 400 (Bad Request)} if the customer has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/customers")
-    public Mono<ResponseEntity<Customer>> createCustomer(@Valid @RequestBody Customer customer) throws URISyntaxException {
-        log.debug("REST request to save Customer : {}", customer);
-        if (customer.getId() != null) {
+    public Mono<ResponseEntity<CustomerDTO>> createCustomer(@Valid @RequestBody CustomerDTO customerDTO) throws URISyntaxException {
+        log.debug("REST request to save Customer : {}", customerDTO);
+        if (customerDTO.getId() != null) {
             throw new BadRequestAlertException("A new customer cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        return customerRepository
-            .save(customer)
+        return customerService
+            .save(customerDTO)
             .map(result -> {
                 try {
                     return ResponseEntity
@@ -78,23 +80,23 @@ public class CustomerResource {
     /**
      * {@code PUT  /customers/:id} : Updates an existing customer.
      *
-     * @param id the id of the customer to save.
-     * @param customer the customer to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated customer,
-     * or with status {@code 400 (Bad Request)} if the customer is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the customer couldn't be updated.
+     * @param id the id of the customerDTO to save.
+     * @param customerDTO the customerDTO to update.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated customerDTO,
+     * or with status {@code 400 (Bad Request)} if the customerDTO is not valid,
+     * or with status {@code 500 (Internal Server Error)} if the customerDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/customers/{id}")
-    public Mono<ResponseEntity<Customer>> updateCustomer(
+    public Mono<ResponseEntity<CustomerDTO>> updateCustomer(
         @PathVariable(value = "id", required = false) final Long id,
-        @Valid @RequestBody Customer customer
+        @Valid @RequestBody CustomerDTO customerDTO
     ) throws URISyntaxException {
-        log.debug("REST request to update Customer : {}, {}", id, customer);
-        if (customer.getId() == null) {
+        log.debug("REST request to update Customer : {}, {}", id, customerDTO);
+        if (customerDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        if (!Objects.equals(id, customer.getId())) {
+        if (!Objects.equals(id, customerDTO.getId())) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
@@ -105,8 +107,8 @@ public class CustomerResource {
                     return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
                 }
 
-                return customerRepository
-                    .save(customer)
+                return customerService
+                    .update(customerDTO)
                     .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
                     .map(result ->
                         ResponseEntity
@@ -120,24 +122,24 @@ public class CustomerResource {
     /**
      * {@code PATCH  /customers/:id} : Partial updates given fields of an existing customer, field will ignore if it is null
      *
-     * @param id the id of the customer to save.
-     * @param customer the customer to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated customer,
-     * or with status {@code 400 (Bad Request)} if the customer is not valid,
-     * or with status {@code 404 (Not Found)} if the customer is not found,
-     * or with status {@code 500 (Internal Server Error)} if the customer couldn't be updated.
+     * @param id the id of the customerDTO to save.
+     * @param customerDTO the customerDTO to update.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated customerDTO,
+     * or with status {@code 400 (Bad Request)} if the customerDTO is not valid,
+     * or with status {@code 404 (Not Found)} if the customerDTO is not found,
+     * or with status {@code 500 (Internal Server Error)} if the customerDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/customers/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    public Mono<ResponseEntity<Customer>> partialUpdateCustomer(
+    public Mono<ResponseEntity<CustomerDTO>> partialUpdateCustomer(
         @PathVariable(value = "id", required = false) final Long id,
-        @NotNull @RequestBody Customer customer
+        @NotNull @RequestBody CustomerDTO customerDTO
     ) throws URISyntaxException {
-        log.debug("REST request to partial update Customer partially : {}, {}", id, customer);
-        if (customer.getId() == null) {
+        log.debug("REST request to partial update Customer partially : {}, {}", id, customerDTO);
+        if (customerDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        if (!Objects.equals(id, customer.getId())) {
+        if (!Objects.equals(id, customerDTO.getId())) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
@@ -148,28 +150,7 @@ public class CustomerResource {
                     return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
                 }
 
-                Mono<Customer> result = customerRepository
-                    .findById(customer.getId())
-                    .map(existingCustomer -> {
-                        if (customer.getFirstName() != null) {
-                            existingCustomer.setFirstName(customer.getFirstName());
-                        }
-                        if (customer.getLastName() != null) {
-                            existingCustomer.setLastName(customer.getLastName());
-                        }
-                        if (customer.getEmail() != null) {
-                            existingCustomer.setEmail(customer.getEmail());
-                        }
-                        if (customer.getPhoneNumber() != null) {
-                            existingCustomer.setPhoneNumber(customer.getPhoneNumber());
-                        }
-                        if (customer.getAddress() != null) {
-                            existingCustomer.setAddress(customer.getAddress());
-                        }
-
-                        return existingCustomer;
-                    })
-                    .flatMap(customerRepository::save);
+                Mono<CustomerDTO> result = customerService.partialUpdate(customerDTO);
 
                 return result
                     .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
@@ -190,14 +171,14 @@ public class CustomerResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of customers in body.
      */
     @GetMapping(value = "/customers", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<List<Customer>>> getAllCustomers(
+    public Mono<ResponseEntity<List<CustomerDTO>>> getAllCustomers(
         @org.springdoc.core.annotations.ParameterObject Pageable pageable,
         ServerHttpRequest request
     ) {
         log.debug("REST request to get a page of Customers");
-        return customerRepository
-            .count()
-            .zipWith(customerRepository.findAllBy(pageable).collectList())
+        return customerService
+            .countAll()
+            .zipWith(customerService.findAll(pageable).collectList())
             .map(countWithEntities ->
                 ResponseEntity
                     .ok()
@@ -214,27 +195,27 @@ public class CustomerResource {
     /**
      * {@code GET  /customers/:id} : get the "id" customer.
      *
-     * @param id the id of the customer to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the customer, or with status {@code 404 (Not Found)}.
+     * @param id the id of the customerDTO to retrieve.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the customerDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/customers/{id}")
-    public Mono<ResponseEntity<Customer>> getCustomer(@PathVariable Long id) {
+    public Mono<ResponseEntity<CustomerDTO>> getCustomer(@PathVariable Long id) {
         log.debug("REST request to get Customer : {}", id);
-        Mono<Customer> customer = customerRepository.findById(id);
-        return ResponseUtil.wrapOrNotFound(customer);
+        Mono<CustomerDTO> customerDTO = customerService.findOne(id);
+        return ResponseUtil.wrapOrNotFound(customerDTO);
     }
 
     /**
      * {@code DELETE  /customers/:id} : delete the "id" customer.
      *
-     * @param id the id of the customer to delete.
+     * @param id the id of the customerDTO to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/customers/{id}")
     public Mono<ResponseEntity<Void>> deleteCustomer(@PathVariable Long id) {
         log.debug("REST request to delete Customer : {}", id);
-        return customerRepository
-            .deleteById(id)
+        return customerService
+            .delete(id)
             .then(
                 Mono.just(
                     ResponseEntity

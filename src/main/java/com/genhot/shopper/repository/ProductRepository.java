@@ -26,15 +26,15 @@ public interface ProductRepository extends ReactiveCrudRepository<Product, Long>
     Flux<Product> findAllWithEagerRelationships(Pageable page);
 
     @Query(
-        "SELECT entity.* FROM product entity JOIN rel_product__category joinTable ON entity.id = joinTable.category_id WHERE joinTable.category_id = :id"
+        "SELECT entity.* FROM product entity JOIN rel_product__categories joinTable ON entity.id = joinTable.categories_id WHERE joinTable.categories_id = :id"
     )
-    Flux<Product> findByCategory(Long id);
+    Flux<Product> findByCategories(Long id);
 
-    @Query("SELECT * FROM product entity WHERE entity.order_id = :id")
-    Flux<Product> findByOrder(Long id);
+    @Query("SELECT * FROM product entity WHERE entity.orders_id = :id")
+    Flux<Product> findByOrders(Long id);
 
-    @Query("SELECT * FROM product entity WHERE entity.order_id IS NULL")
-    Flux<Product> findAllWhereOrderIsNull();
+    @Query("SELECT * FROM product entity WHERE entity.orders_id IS NULL")
+    Flux<Product> findAllWhereOrdersIsNull();
 
     @Override
     <S extends Product> Mono<S> save(S entity);

@@ -40,12 +40,12 @@ class ProductRepositoryInternalImpl extends SimpleR2dbcRepository<Product, Long>
     private final ProductRowMapper productMapper;
 
     private static final Table entityTable = Table.aliased("product", EntityManager.ENTITY_ALIAS);
-    private static final Table orderTable = Table.aliased("jhi_order", "e_order");
+    private static final Table ordersTable = Table.aliased("jhi_order", "orders");
 
-    private static final EntityManager.LinkTable categoryLink = new EntityManager.LinkTable(
-        "rel_product__category",
+    private static final EntityManager.LinkTable categoriesLink = new EntityManager.LinkTable(
+        "rel_product__categories",
         "product_id",
-        "category_id"
+        "categories_id"
     );
 
     public ProductRepositoryInternalImpl(
@@ -75,14 +75,14 @@ class ProductRepositoryInternalImpl extends SimpleR2dbcRepository<Product, Long>
 
     RowsFetchSpec<Product> createQuery(Pageable pageable, Condition whereClause) {
         List<Expression> columns = ProductSqlHelper.getColumns(entityTable, EntityManager.ENTITY_ALIAS);
-        columns.addAll(OrderSqlHelper.getColumns(orderTable, "order"));
+        columns.addAll(OrderSqlHelper.getColumns(ordersTable, "orders"));
         SelectFromAndJoinCondition selectFrom = Select
             .builder()
             .select(columns)
             .from(entityTable)
-            .leftOuterJoin(orderTable)
-            .on(Column.create("order_id", entityTable))
-            .equals(Column.create("id", orderTable));
+            .leftOuterJoin(ordersTable)
+            .on(Column.create("orders_id", entityTable))
+            .equals(Column.create("id", ordersTable));
         // we do not support Criteria here for now as of https://github.com/jhipster/generator-jhipster/issues/18269
         String select = entityManager.createSelect(selectFrom, Product.class, pageable, whereClause);
         return db.sql(select).map(this::process);
@@ -116,7 +116,7 @@ class ProductRepositoryInternalImpl extends SimpleR2dbcRepository<Product, Long>
 
     private Product process(Row row, RowMetadata metadata) {
         Product entity = productMapper.apply(row, "e");
-        entity.setOrder(orderMapper.apply(row, "order"));
+        entity.setOrders(orderMapper.apply(row, "orders"));
         return entity;
     }
 
@@ -127,7 +127,7 @@ class ProductRepositoryInternalImpl extends SimpleR2dbcRepository<Product, Long>
 
     protected <S extends Product> Mono<S> updateRelations(S entity) {
         Mono<Void> result = entityManager
-            .updateLinkTable(categoryLink, entity.getId(), entity.getCategories().stream().map(Category::getId))
+            .updateLinkTable(categoriesLink, entity.getId(), entity.getCategories().stream().map(Category::getId))
             .then();
         return result.thenReturn(entity);
     }
@@ -138,6 +138,6 @@ class ProductRepositoryInternalImpl extends SimpleR2dbcRepository<Product, Long>
     }
 
     protected Mono<Void> deleteRelations(Long entityId) {
-        return entityManager.deleteFromLinkTable(categoryLink, entityId);
+        return entityManager.deleteFromLinkTable(categoriesLink, entityId);
     }
 }

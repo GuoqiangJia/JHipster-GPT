@@ -55,12 +55,6 @@ export const CustomerDetail = () => {
             </span>
           </dt>
           <dd>{customerEntity.phoneNumber}</dd>
-          <dt>
-            <span id="address">
-              <Translate contentKey="shopperApp.customer.address">Address</Translate>
-            </span>
-          </dt>
-          <dd>{customerEntity.address}</dd>
         </dl>
         <Button tag={Link} to="/customer" replace color="info" data-cy="entityDetailsBackButton">
           <FontAwesomeIcon icon="arrow-left" />{' '}

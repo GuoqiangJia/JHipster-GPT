@@ -21,9 +21,9 @@
       "date": "Date",
       "status": "Status",
       "totalPrice": "Total Price",
-      "product": "Product",
+      "products": "Products",
       "customer": "Customer",
-      "delivery": "Delivery"
+      "deliveries": "Deliveries"
     }
   }
 }

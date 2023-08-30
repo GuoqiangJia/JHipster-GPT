@@ -1,6 +1,5 @@
 package com.genhot.shopper.web.rest;
 
-import static com.genhot.shopper.web.rest.TestUtil.sameNumber;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
@@ -9,7 +8,8 @@ import com.genhot.shopper.IntegrationTest;
 import com.genhot.shopper.domain.Order;
 import com.genhot.shopper.repository.EntityManager;
 import com.genhot.shopper.repository.OrderRepository;
-import java.math.BigDecimal;
+import com.genhot.shopper.service.dto.OrderDTO;
+import com.genhot.shopper.service.mapper.OrderMapper;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -38,8 +38,8 @@ class OrderResourceIT {
     private static final String DEFAULT_STATUS = "AAAAAAAAAA";
     private static final String UPDATED_STATUS = "BBBBBBBBBB";
 
-    private static final BigDecimal DEFAULT_TOTAL_PRICE = new BigDecimal(1);
-    private static final BigDecimal UPDATED_TOTAL_PRICE = new BigDecimal(2);
+    private static final Double DEFAULT_TOTAL_PRICE = 1D;
+    private static final Double UPDATED_TOTAL_PRICE = 2D;
 
     private static final String ENTITY_API_URL = "/api/orders";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -49,6 +49,9 @@ class OrderResourceIT {
 
     @Autowired
     private OrderRepository orderRepository;
+
+    @Autowired
+    private OrderMapper orderMapper;
 
     @Autowired
     private EntityManager em;
@@ -103,11 +106,12 @@ class OrderResourceIT {
     void createOrder() throws Exception {
         int databaseSizeBeforeCreate = orderRepository.findAll().collectList().block().size();
         // Create the Order
+        OrderDTO orderDTO = orderMapper.toDto(order);
         webTestClient
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(order))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(orderDTO))
             .exchange()
             .expectStatus()
             .isCreated();
@@ -118,13 +122,14 @@ class OrderResourceIT {
         Order testOrder = orderList.get(orderList.size() - 1);
         assertThat(testOrder.getDate()).isEqualTo(DEFAULT_DATE);
         assertThat(testOrder.getStatus()).isEqualTo(DEFAULT_STATUS);
-        assertThat(testOrder.getTotalPrice()).isEqualByComparingTo(DEFAULT_TOTAL_PRICE);
+        assertThat(testOrder.getTotalPrice()).isEqualTo(DEFAULT_TOTAL_PRICE);
     }
 
     @Test
     void createOrderWithExistingId() throws Exception {
         // Create the Order with an existing ID
         order.setId(1L);
+        OrderDTO orderDTO = orderMapper.toDto(order);
 
         int databaseSizeBeforeCreate = orderRepository.findAll().collectList().block().size();
 
@@ -133,7 +138,7 @@ class OrderResourceIT {
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(order))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(orderDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -150,12 +155,13 @@ class OrderResourceIT {
         order.setDate(null);
 
         // Create the Order, which fails.
+        OrderDTO orderDTO = orderMapper.toDto(order);
 
         webTestClient
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(order))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(orderDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -171,12 +177,13 @@ class OrderResourceIT {
         order.setStatus(null);
 
         // Create the Order, which fails.
+        OrderDTO orderDTO = orderMapper.toDto(order);
 
         webTestClient
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(order))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(orderDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -192,12 +199,13 @@ class OrderResourceIT {
         order.setTotalPrice(null);
 
         // Create the Order, which fails.
+        OrderDTO orderDTO = orderMapper.toDto(order);
 
         webTestClient
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(order))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(orderDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -229,7 +237,7 @@ class OrderResourceIT {
             .jsonPath("$.[*].status")
             .value(hasItem(DEFAULT_STATUS))
             .jsonPath("$.[*].totalPrice")
-            .value(hasItem(sameNumber(DEFAULT_TOTAL_PRICE)));
+            .value(hasItem(DEFAULT_TOTAL_PRICE.doubleValue()));
     }
 
     @Test
@@ -255,7 +263,7 @@ class OrderResourceIT {
             .jsonPath("$.status")
             .value(is(DEFAULT_STATUS))
             .jsonPath("$.totalPrice")
-            .value(is(sameNumber(DEFAULT_TOTAL_PRICE)));
+            .value(is(DEFAULT_TOTAL_PRICE.doubleValue()));
     }
 
     @Test
@@ -280,12 +288,13 @@ class OrderResourceIT {
         // Update the order
         Order updatedOrder = orderRepository.findById(order.getId()).block();
         updatedOrder.date(UPDATED_DATE).status(UPDATED_STATUS).totalPrice(UPDATED_TOTAL_PRICE);
+        OrderDTO orderDTO = orderMapper.toDto(updatedOrder);
 
         webTestClient
             .put()
-            .uri(ENTITY_API_URL_ID, updatedOrder.getId())
+            .uri(ENTITY_API_URL_ID, orderDTO.getId())
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(updatedOrder))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(orderDTO))
             .exchange()
             .expectStatus()
             .isOk();
@@ -296,7 +305,7 @@ class OrderResourceIT {
         Order testOrder = orderList.get(orderList.size() - 1);
         assertThat(testOrder.getDate()).isEqualTo(UPDATED_DATE);
         assertThat(testOrder.getStatus()).isEqualTo(UPDATED_STATUS);
-        assertThat(testOrder.getTotalPrice()).isEqualByComparingTo(UPDATED_TOTAL_PRICE);
+        assertThat(testOrder.getTotalPrice()).isEqualTo(UPDATED_TOTAL_PRICE);
     }
 
     @Test
@@ -304,12 +313,15 @@ class OrderResourceIT {
         int databaseSizeBeforeUpdate = orderRepository.findAll().collectList().block().size();
         order.setId(count.incrementAndGet());
 
+        // Create the Order
+        OrderDTO orderDTO = orderMapper.toDto(order);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         webTestClient
             .put()
-            .uri(ENTITY_API_URL_ID, order.getId())
+            .uri(ENTITY_API_URL_ID, orderDTO.getId())
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(order))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(orderDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -324,12 +336,15 @@ class OrderResourceIT {
         int databaseSizeBeforeUpdate = orderRepository.findAll().collectList().block().size();
         order.setId(count.incrementAndGet());
 
+        // Create the Order
+        OrderDTO orderDTO = orderMapper.toDto(order);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .put()
             .uri(ENTITY_API_URL_ID, count.incrementAndGet())
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(order))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(orderDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -344,12 +359,15 @@ class OrderResourceIT {
         int databaseSizeBeforeUpdate = orderRepository.findAll().collectList().block().size();
         order.setId(count.incrementAndGet());
 
+        // Create the Order
+        OrderDTO orderDTO = orderMapper.toDto(order);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .put()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(order))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(orderDTO))
             .exchange()
             .expectStatus()
             .isEqualTo(405);
@@ -387,7 +405,7 @@ class OrderResourceIT {
         Order testOrder = orderList.get(orderList.size() - 1);
         assertThat(testOrder.getDate()).isEqualTo(DEFAULT_DATE);
         assertThat(testOrder.getStatus()).isEqualTo(DEFAULT_STATUS);
-        assertThat(testOrder.getTotalPrice()).isEqualByComparingTo(UPDATED_TOTAL_PRICE);
+        assertThat(testOrder.getTotalPrice()).isEqualTo(UPDATED_TOTAL_PRICE);
     }
 
     @Test
@@ -418,7 +436,7 @@ class OrderResourceIT {
         Order testOrder = orderList.get(orderList.size() - 1);
         assertThat(testOrder.getDate()).isEqualTo(UPDATED_DATE);
         assertThat(testOrder.getStatus()).isEqualTo(UPDATED_STATUS);
-        assertThat(testOrder.getTotalPrice()).isEqualByComparingTo(UPDATED_TOTAL_PRICE);
+        assertThat(testOrder.getTotalPrice()).isEqualTo(UPDATED_TOTAL_PRICE);
     }
 
     @Test
@@ -426,12 +444,15 @@ class OrderResourceIT {
         int databaseSizeBeforeUpdate = orderRepository.findAll().collectList().block().size();
         order.setId(count.incrementAndGet());
 
+        // Create the Order
+        OrderDTO orderDTO = orderMapper.toDto(order);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         webTestClient
             .patch()
-            .uri(ENTITY_API_URL_ID, order.getId())
+            .uri(ENTITY_API_URL_ID, orderDTO.getId())
             .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(TestUtil.convertObjectToJsonBytes(order))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(orderDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -446,12 +467,15 @@ class OrderResourceIT {
         int databaseSizeBeforeUpdate = orderRepository.findAll().collectList().block().size();
         order.setId(count.incrementAndGet());
 
+        // Create the Order
+        OrderDTO orderDTO = orderMapper.toDto(order);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .patch()
             .uri(ENTITY_API_URL_ID, count.incrementAndGet())
             .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(TestUtil.convertObjectToJsonBytes(order))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(orderDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -466,12 +490,15 @@ class OrderResourceIT {
         int databaseSizeBeforeUpdate = orderRepository.findAll().collectList().block().size();
         order.setId(count.incrementAndGet());
 
+        // Create the Order
+        OrderDTO orderDTO = orderMapper.toDto(order);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .patch()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(TestUtil.convertObjectToJsonBytes(order))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(orderDTO))
             .exchange()
             .expectStatus()
             .isEqualTo(405);

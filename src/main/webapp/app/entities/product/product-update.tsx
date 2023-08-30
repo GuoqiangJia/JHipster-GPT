@@ -56,7 +56,7 @@ export const ProductUpdate = () => {
       ...productEntity,
       ...values,
       categories: mapIdList(values.categories),
-      order: orders.find(it => it.id.toString() === values.order.toString()),
+      orders: orders.find(it => it.id.toString() === values.orders.toString()),
     };
 
     if (isNew) {
@@ -72,7 +72,7 @@ export const ProductUpdate = () => {
       : {
           ...productEntity,
           categories: productEntity?.categories?.map(e => e.id.toString()),
-          order: productEntity?.order?.id,
+          orders: productEntity?.orders?.id,
         };
 
   return (
@@ -140,9 +140,9 @@ export const ProductUpdate = () => {
                 }}
               />
               <ValidatedField
-                label={translate('shopperApp.product.category')}
-                id="product-category"
-                data-cy="category"
+                label={translate('shopperApp.product.categories')}
+                id="product-categories"
+                data-cy="categories"
                 type="select"
                 multiple
                 name="categories"
@@ -156,7 +156,13 @@ export const ProductUpdate = () => {
                     ))
                   : null}
               </ValidatedField>
-              <ValidatedField id="product-order" name="order" data-cy="order" label={translate('shopperApp.product.order')} type="select">
+              <ValidatedField
+                id="product-orders"
+                name="orders"
+                data-cy="orders"
+                label={translate('shopperApp.product.orders')}
+                type="select"
+              >
                 <option value="" key="0" />
                 {orders
                   ? orders.map(otherEntity => (

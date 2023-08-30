@@ -129,7 +129,7 @@ export const Product = () => {
                   <FontAwesomeIcon icon={getSortIconByFieldName('inventory')} />
                 </th>
                 <th>
-                  <Translate contentKey="shopperApp.product.order">Order</Translate> <FontAwesomeIcon icon="sort" />
+                  <Translate contentKey="shopperApp.product.orders">Orders</Translate> <FontAwesomeIcon icon="sort" />
                 </th>
                 <th />
               </tr>
@@ -146,7 +146,7 @@ export const Product = () => {
                   <td>{product.description}</td>
                   <td>{product.price}</td>
                   <td>{product.inventory}</td>
-                  <td>{product.order ? <Link to={`/order/${product.order.id}`}>{product.order.id}</Link> : ''}</td>
+                  <td>{product.orders ? <Link to={`/order/${product.orders.id}`}>{product.orders.id}</Link> : ''}</td>
                   <td className="text-end">
                     <div className="btn-group flex-btn-group-container">
                       <Button tag={Link} to={`/product/${product.id}`} color="info" size="sm" data-cy="entityDetailsButton">

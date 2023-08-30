@@ -58,7 +58,7 @@ export const OrderUpdate = () => {
       ...orderEntity,
       ...values,
       customer: customers.find(it => it.id.toString() === values.customer.toString()),
-      delivery: deliveries.find(it => it.id.toString() === values.delivery.toString()),
+      deliveries: deliveries.find(it => it.id.toString() === values.deliveries.toString()),
     };
 
     if (isNew) {
@@ -77,7 +77,7 @@ export const OrderUpdate = () => {
           ...orderEntity,
           date: convertDateTimeFromServer(orderEntity.date),
           customer: orderEntity?.customer?.id,
-          delivery: orderEntity?.delivery?.id,
+          deliveries: orderEntity?.deliveries?.id,
         };
 
   return (
@@ -154,10 +154,10 @@ export const OrderUpdate = () => {
                   : null}
               </ValidatedField>
               <ValidatedField
-                id="order-delivery"
-                name="delivery"
-                data-cy="delivery"
-                label={translate('shopperApp.order.delivery')}
+                id="order-deliveries"
+                name="deliveries"
+                data-cy="deliveries"
+                label={translate('shopperApp.order.deliveries')}
                 type="select"
               >
                 <option value="" key="0" />

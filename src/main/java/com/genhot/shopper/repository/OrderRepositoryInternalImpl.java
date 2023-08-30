@@ -42,7 +42,7 @@ class OrderRepositoryInternalImpl extends SimpleR2dbcRepository<Order, Long> imp
 
     private static final Table entityTable = Table.aliased("jhi_order", EntityManager.ENTITY_ALIAS);
     private static final Table customerTable = Table.aliased("customer", "customer");
-    private static final Table deliveryTable = Table.aliased("delivery", "delivery");
+    private static final Table deliveriesTable = Table.aliased("delivery", "deliveries");
 
     public OrderRepositoryInternalImpl(
         R2dbcEntityTemplate template,
@@ -74,7 +74,7 @@ class OrderRepositoryInternalImpl extends SimpleR2dbcRepository<Order, Long> imp
     RowsFetchSpec<Order> createQuery(Pageable pageable, Condition whereClause) {
         List<Expression> columns = OrderSqlHelper.getColumns(entityTable, EntityManager.ENTITY_ALIAS);
         columns.addAll(CustomerSqlHelper.getColumns(customerTable, "customer"));
-        columns.addAll(DeliverySqlHelper.getColumns(deliveryTable, "delivery"));
+        columns.addAll(DeliverySqlHelper.getColumns(deliveriesTable, "deliveries"));
         SelectFromAndJoinCondition selectFrom = Select
             .builder()
             .select(columns)
@@ -82,9 +82,9 @@ class OrderRepositoryInternalImpl extends SimpleR2dbcRepository<Order, Long> imp
             .leftOuterJoin(customerTable)
             .on(Column.create("customer_id", entityTable))
             .equals(Column.create("id", customerTable))
-            .leftOuterJoin(deliveryTable)
-            .on(Column.create("delivery_id", entityTable))
-            .equals(Column.create("id", deliveryTable));
+            .leftOuterJoin(deliveriesTable)
+            .on(Column.create("deliveries_id", entityTable))
+            .equals(Column.create("id", deliveriesTable));
         // we do not support Criteria here for now as of https://github.com/jhipster/generator-jhipster/issues/18269
         String select = entityManager.createSelect(selectFrom, Order.class, pageable, whereClause);
         return db.sql(select).map(this::process);
@@ -104,7 +104,7 @@ class OrderRepositoryInternalImpl extends SimpleR2dbcRepository<Order, Long> imp
     private Order process(Row row, RowMetadata metadata) {
         Order entity = orderMapper.apply(row, "e");
         entity.setCustomer(customerMapper.apply(row, "customer"));
-        entity.setDelivery(deliveryMapper.apply(row, "delivery"));
+        entity.setDeliveries(deliveryMapper.apply(row, "deliveries"));
         return entity;
     }
 

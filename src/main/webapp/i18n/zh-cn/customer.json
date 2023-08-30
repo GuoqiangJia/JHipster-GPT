@@ -22,9 +22,8 @@
       "lastName": "Last Name",
       "email": "Email",
       "phoneNumber": "Phone Number",
-      "address": "Address",
-      "address": "Address",
-      "order": "Order"
+      "addresses": "Addresses",
+      "orders": "Orders"
     }
   }
 }

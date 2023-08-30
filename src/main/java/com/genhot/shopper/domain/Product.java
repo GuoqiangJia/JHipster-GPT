@@ -3,7 +3,6 @@ package com.genhot.shopper.domain;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 import org.springframework.data.annotation.Id;
@@ -33,7 +32,7 @@ public class Product implements Serializable {
 
     @NotNull(message = "must not be null")
     @Column("price")
-    private BigDecimal price;
+    private Double price;
 
     @NotNull(message = "must not be null")
     @Column("inventory")
@@ -44,11 +43,11 @@ public class Product implements Serializable {
     private Set<Category> categories = new HashSet<>();
 
     @Transient
-    @JsonIgnoreProperties(value = { "products", "customer", "delivery" }, allowSetters = true)
-    private Order order;
+    @JsonIgnoreProperties(value = { "products", "customer", "deliveries" }, allowSetters = true)
+    private Order orders;
 
-    @Column("order_id")
-    private Long orderId;
+    @Column("orders_id")
+    private Long ordersId;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -91,17 +90,17 @@ public class Product implements Serializable {
         this.description = description;
     }
 
-    public BigDecimal getPrice() {
+    public Double getPrice() {
         return this.price;
     }
 
-    public Product price(BigDecimal price) {
+    public Product price(Double price) {
         this.setPrice(price);
         return this;
     }
 
-    public void setPrice(BigDecimal price) {
-        this.price = price != null ? price.stripTrailingZeros() : null;
+    public void setPrice(Double price) {
+        this.price = price;
     }
 
     public Integer getInventory() {
@@ -130,38 +129,38 @@ public class Product implements Serializable {
         return this;
     }
 
-    public Product addCategory(Category category) {
+    public Product addCategories(Category category) {
         this.categories.add(category);
         category.getProducts().add(this);
         return this;
     }
 
-    public Product removeCategory(Category category) {
+    public Product removeCategories(Category category) {
         this.categories.remove(category);
         category.getProducts().remove(this);
         return this;
     }
 
-    public Order getOrder() {
-        return this.order;
+    public Order getOrders() {
+        return this.orders;
     }
 
-    public void setOrder(Order order) {
-        this.order = order;
-        this.orderId = order != null ? order.getId() : null;
+    public void setOrders(Order order) {
+        this.orders = order;
+        this.ordersId = order != null ? order.getId() : null;
     }
 
-    public Product order(Order order) {
-        this.setOrder(order);
+    public Product orders(Order order) {
+        this.setOrders(order);
         return this;
     }
 
-    public Long getOrderId() {
-        return this.orderId;
+    public Long getOrdersId() {
+        return this.ordersId;
     }
 
-    public void setOrderId(Long order) {
-        this.orderId = order;
+    public void setOrdersId(Long order) {
+        this.ordersId = order;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here

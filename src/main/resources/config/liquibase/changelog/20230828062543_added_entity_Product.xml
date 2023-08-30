@@ -9,7 +9,7 @@
     <!--
         Added the entity Product.
     -->
-    <changeSet id="20230816024348-1" author="jhipster">
+    <changeSet id="20230828062543-1" author="jhipster">
         <createTable tableName="product">
             <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
@@ -20,23 +20,23 @@
             <column name="description" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
-            <column name="price" type="decimal(21,2)">
+            <column name="price" type="double">
                 <constraints nullable="false" />
             </column>
             <column name="inventory" type="integer">
                 <constraints nullable="false" />
             </column>
-            <column name="order_id" type="bigint">
+            <column name="orders_id" type="bigint">
                 <constraints nullable="true" />
             </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
         </createTable>
     </changeSet>
 
-    <changeSet id="20230816024348-1-relations" author="jhipster">
+    <changeSet id="20230828062543-1-relations" author="jhipster">
 
-        <createTable tableName="rel_product__category">
-            <column name="category_id" type="bigint">
+        <createTable tableName="rel_product__categories">
+            <column name="categories_id" type="bigint">
                 <constraints nullable="false"/>
             </column>
             <column name="product_id" type="bigint">
@@ -44,7 +44,7 @@
             </column>
         </createTable>
 
-        <addPrimaryKey columnNames="product_id, category_id" tableName="rel_product__category"/>
+        <addPrimaryKey columnNames="product_id, categories_id" tableName="rel_product__categories"/>
     </changeSet>
 
     <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
@@ -57,7 +57,7 @@
           This can be customized by adding or removing 'faker' in the 'spring.liquibase.contexts'
           Spring Boot configuration key.
     -->
-    <changeSet id="20230816024348-1-data" author="jhipster" context="faker">
+    <changeSet id="20230828062543-1-data" author="jhipster" context="faker">
         <loadData
                   file="config/liquibase/fake-data/product.csv"
                   separator=";"

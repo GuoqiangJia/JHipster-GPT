@@ -7,7 +7,6 @@ export interface ICustomer {
   lastName?: string;
   email?: string;
   phoneNumber?: string | null;
-  address?: string | null;
   addresses?: IAddress[] | null;
   orders?: IOrder[] | null;
 }

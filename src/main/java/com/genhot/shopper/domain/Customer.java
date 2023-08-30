@@ -38,15 +38,12 @@ public class Customer implements Serializable {
     @Column("phone_number")
     private String phoneNumber;
 
-    @Column("address")
-    private String address;
-
     @Transient
     @JsonIgnoreProperties(value = { "customer" }, allowSetters = true)
     private Set<Address> addresses = new HashSet<>();
 
     @Transient
-    @JsonIgnoreProperties(value = { "products", "customer", "delivery" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "products", "customer", "deliveries" }, allowSetters = true)
     private Set<Order> orders = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -116,19 +113,6 @@ public class Customer implements Serializable {
         this.phoneNumber = phoneNumber;
     }
 
-    public String getAddress() {
-        return this.address;
-    }
-
-    public Customer address(String address) {
-        this.setAddress(address);
-        return this;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
     public Set<Address> getAddresses() {
         return this.addresses;
     }
@@ -148,13 +132,13 @@ public class Customer implements Serializable {
         return this;
     }
 
-    public Customer addAddress(Address address) {
+    public Customer addAddresses(Address address) {
         this.addresses.add(address);
         address.setCustomer(this);
         return this;
     }
 
-    public Customer removeAddress(Address address) {
+    public Customer removeAddresses(Address address) {
         this.addresses.remove(address);
         address.setCustomer(null);
         return this;
@@ -179,13 +163,13 @@ public class Customer implements Serializable {
         return this;
     }
 
-    public Customer addOrder(Order order) {
+    public Customer addOrders(Order order) {
         this.orders.add(order);
         order.setCustomer(this);
         return this;
     }
 
-    public Customer removeOrder(Order order) {
+    public Customer removeOrders(Order order) {
         this.orders.remove(order);
         order.setCustomer(null);
         return this;
@@ -219,7 +203,6 @@ public class Customer implements Serializable {
             ", lastName='" + getLastName() + "'" +
             ", email='" + getEmail() + "'" +
             ", phoneNumber='" + getPhoneNumber() + "'" +
-            ", address='" + getAddress() + "'" +
             "}";
     }
 }

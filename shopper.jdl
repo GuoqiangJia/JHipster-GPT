@@ -1,11 +1,10 @@
 application {
+
   config {
     baseName shopper
-    applicationType monolith
     packageName com.genhot.shopper
     authenticationType jwt
     prodDatabaseType postgresql
-    serviceDiscoveryType no
     clientFramework react
     serverPort 8081
     reactive true
@@ -14,12 +13,13 @@ application {
   }
 
   entities Product, Category, Customer, Address, Order, Delivery
+
 }
 
 entity Product {
   name String required
   description String
-  price BigDecimal required
+  price Double required 
   inventory Integer required
 }
 
@@ -27,10 +27,12 @@ entity Category {
   name String required
   description String
   status CategoryStatus required
-}
+} 
 
 enum CategoryStatus {
-  AVAILABLE, RESTRICTED, DISABLED
+  AVAILABLE
+  RESTRICTED
+  DISABLED  
 }
 
 entity Customer {
@@ -38,12 +40,11 @@ entity Customer {
   lastName String required
   email String required
   phoneNumber String
-  address String
 }
 
 entity Address {
   address1 String
-  city String
+  city String  
   state String
   zipcode String
   country String
@@ -52,7 +53,7 @@ entity Address {
 entity Order {
   date Instant required
   status String required
-  totalPrice BigDecimal required
+  totalPrice Double required
 }
 
 entity Delivery {
@@ -62,20 +63,18 @@ entity Delivery {
 }
 
 relationship ManyToMany {
-  Product{category(name)} to Category{product}
+  Product{categories(name)} to Category{products}
 }
 
 relationship OneToMany {
-  Customer{address} to Address{customer}
-  Customer{order} to Order{customer}
-}
-
-relationship OneToMany {
-  Order{product} to Product{order}
-}
-
-relationship OneToMany {
-  Delivery{order} to Order{delivery}
+  Customer{addresses} to Address{customer}
+  Customer{orders} to Order{customer}
+  Order{products} to Product{orders}
+  Delivery{orders} to Order{deliveries}
 }
 
 paginate all with pagination
+
+dto all with mapstruct
+
+service all with serviceImpl

@@ -6,7 +6,7 @@
     <!--
         Added the constraints for entity Order.
     -->
-    <changeSet id="20230816024352-2" author="jhipster">
+    <changeSet id="20230828062547-2" author="jhipster">
 
         <addForeignKeyConstraint baseColumnNames="customer_id"
                                  baseTableName="jhi_order"
@@ -15,9 +15,9 @@
                                  referencedTableName="customer"
                                  />
 
-        <addForeignKeyConstraint baseColumnNames="delivery_id"
+        <addForeignKeyConstraint baseColumnNames="deliveries_id"
                                  baseTableName="jhi_order"
-                                 constraintName="fk_jhi_order__delivery_id"
+                                 constraintName="fk_jhi_order__deliveries_id"
                                  referencedColumnNames="id"
                                  referencedTableName="delivery"
                                  />

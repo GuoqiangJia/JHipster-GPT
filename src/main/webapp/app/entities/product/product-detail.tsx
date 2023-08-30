@@ -56,7 +56,7 @@ export const ProductDetail = () => {
           </dt>
           <dd>{productEntity.inventory}</dd>
           <dt>
-            <Translate contentKey="shopperApp.product.category">Category</Translate>
+            <Translate contentKey="shopperApp.product.categories">Categories</Translate>
           </dt>
           <dd>
             {productEntity.categories
@@ -69,9 +69,9 @@ export const ProductDetail = () => {
               : null}
           </dd>
           <dt>
-            <Translate contentKey="shopperApp.product.order">Order</Translate>
+            <Translate contentKey="shopperApp.product.orders">Orders</Translate>
           </dt>
-          <dd>{productEntity.order ? productEntity.order.id : ''}</dd>
+          <dd>{productEntity.orders ? productEntity.orders.id : ''}</dd>
         </dl>
         <Button tag={Link} to="/product" replace color="info" data-cy="entityDetailsBackButton">
           <FontAwesomeIcon icon="arrow-left" />{' '}

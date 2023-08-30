@@ -124,13 +124,6 @@ export const CustomerUpdate = () => {
                 data-cy="phoneNumber"
                 type="text"
               />
-              <ValidatedField
-                label={translate('shopperApp.customer.address')}
-                id="customer-address"
-                name="address"
-                data-cy="address"
-                type="text"
-              />
               <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/customer" replace color="info">
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;

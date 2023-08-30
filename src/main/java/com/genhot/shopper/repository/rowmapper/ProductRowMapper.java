@@ -2,7 +2,6 @@ package com.genhot.shopper.repository.rowmapper;
 
 import com.genhot.shopper.domain.Product;
 import io.r2dbc.spi.Row;
-import java.math.BigDecimal;
 import java.util.function.BiFunction;
 import org.springframework.stereotype.Service;
 
@@ -28,9 +27,9 @@ public class ProductRowMapper implements BiFunction<Row, String, Product> {
         entity.setId(converter.fromRow(row, prefix + "_id", Long.class));
         entity.setName(converter.fromRow(row, prefix + "_name", String.class));
         entity.setDescription(converter.fromRow(row, prefix + "_description", String.class));
-        entity.setPrice(converter.fromRow(row, prefix + "_price", BigDecimal.class));
+        entity.setPrice(converter.fromRow(row, prefix + "_price", Double.class));
         entity.setInventory(converter.fromRow(row, prefix + "_inventory", Integer.class));
-        entity.setOrderId(converter.fromRow(row, prefix + "_order_id", Long.class));
+        entity.setOrdersId(converter.fromRow(row, prefix + "_orders_id", Long.class));
         return entity;
     }
 }

@@ -36,7 +36,7 @@ public class Category implements Serializable {
     private CategoryStatus status;
 
     @Transient
-    @JsonIgnoreProperties(value = { "categories", "order" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "categories", "orders" }, allowSetters = true)
     private Set<Product> products = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -99,10 +99,10 @@ public class Category implements Serializable {
 
     public void setProducts(Set<Product> products) {
         if (this.products != null) {
-            this.products.forEach(i -> i.removeCategory(this));
+            this.products.forEach(i -> i.removeCategories(this));
         }
         if (products != null) {
-            products.forEach(i -> i.addCategory(this));
+            products.forEach(i -> i.addCategories(this));
         }
         this.products = products;
     }
@@ -112,13 +112,13 @@ public class Category implements Serializable {
         return this;
     }
 
-    public Category addProduct(Product product) {
+    public Category addProducts(Product product) {
         this.products.add(product);
         product.getCategories().add(this);
         return this;
     }
 
-    public Category removeProduct(Product product) {
+    public Category removeProducts(Product product) {
         this.products.remove(product);
         product.getCategories().remove(this);
         return this;

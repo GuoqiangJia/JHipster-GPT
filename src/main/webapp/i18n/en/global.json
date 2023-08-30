@@ -13,6 +13,7 @@
         "address": "Address",
         "order": "Order",
         "delivery": "Delivery",
+        "orderStat": "Order Stat",
         "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"
       },
       "account": {

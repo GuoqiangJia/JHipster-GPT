@@ -9,6 +9,8 @@ import com.genhot.shopper.domain.Category;
 import com.genhot.shopper.domain.enumeration.CategoryStatus;
 import com.genhot.shopper.repository.CategoryRepository;
 import com.genhot.shopper.repository.EntityManager;
+import com.genhot.shopper.service.dto.CategoryDTO;
+import com.genhot.shopper.service.mapper.CategoryMapper;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
@@ -46,6 +48,9 @@ class CategoryResourceIT {
 
     @Autowired
     private CategoryRepository categoryRepository;
+
+    @Autowired
+    private CategoryMapper categoryMapper;
 
     @Autowired
     private EntityManager em;
@@ -100,11 +105,12 @@ class CategoryResourceIT {
     void createCategory() throws Exception {
         int databaseSizeBeforeCreate = categoryRepository.findAll().collectList().block().size();
         // Create the Category
+        CategoryDTO categoryDTO = categoryMapper.toDto(category);
         webTestClient
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(category))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(categoryDTO))
             .exchange()
             .expectStatus()
             .isCreated();
@@ -122,6 +128,7 @@ class CategoryResourceIT {
     void createCategoryWithExistingId() throws Exception {
         // Create the Category with an existing ID
         category.setId(1L);
+        CategoryDTO categoryDTO = categoryMapper.toDto(category);
 
         int databaseSizeBeforeCreate = categoryRepository.findAll().collectList().block().size();
 
@@ -130,7 +137,7 @@ class CategoryResourceIT {
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(category))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(categoryDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -147,12 +154,13 @@ class CategoryResourceIT {
         category.setName(null);
 
         // Create the Category, which fails.
+        CategoryDTO categoryDTO = categoryMapper.toDto(category);
 
         webTestClient
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(category))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(categoryDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -168,12 +176,13 @@ class CategoryResourceIT {
         category.setStatus(null);
 
         // Create the Category, which fails.
+        CategoryDTO categoryDTO = categoryMapper.toDto(category);
 
         webTestClient
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(category))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(categoryDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -256,12 +265,13 @@ class CategoryResourceIT {
         // Update the category
         Category updatedCategory = categoryRepository.findById(category.getId()).block();
         updatedCategory.name(UPDATED_NAME).description(UPDATED_DESCRIPTION).status(UPDATED_STATUS);
+        CategoryDTO categoryDTO = categoryMapper.toDto(updatedCategory);
 
         webTestClient
             .put()
-            .uri(ENTITY_API_URL_ID, updatedCategory.getId())
+            .uri(ENTITY_API_URL_ID, categoryDTO.getId())
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(updatedCategory))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(categoryDTO))
             .exchange()
             .expectStatus()
             .isOk();
@@ -280,12 +290,15 @@ class CategoryResourceIT {
         int databaseSizeBeforeUpdate = categoryRepository.findAll().collectList().block().size();
         category.setId(count.incrementAndGet());
 
+        // Create the Category
+        CategoryDTO categoryDTO = categoryMapper.toDto(category);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         webTestClient
             .put()
-            .uri(ENTITY_API_URL_ID, category.getId())
+            .uri(ENTITY_API_URL_ID, categoryDTO.getId())
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(category))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(categoryDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -300,12 +313,15 @@ class CategoryResourceIT {
         int databaseSizeBeforeUpdate = categoryRepository.findAll().collectList().block().size();
         category.setId(count.incrementAndGet());
 
+        // Create the Category
+        CategoryDTO categoryDTO = categoryMapper.toDto(category);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .put()
             .uri(ENTITY_API_URL_ID, count.incrementAndGet())
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(category))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(categoryDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -320,12 +336,15 @@ class CategoryResourceIT {
         int databaseSizeBeforeUpdate = categoryRepository.findAll().collectList().block().size();
         category.setId(count.incrementAndGet());
 
+        // Create the Category
+        CategoryDTO categoryDTO = categoryMapper.toDto(category);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .put()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(category))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(categoryDTO))
             .exchange()
             .expectStatus()
             .isEqualTo(405);
@@ -402,12 +421,15 @@ class CategoryResourceIT {
         int databaseSizeBeforeUpdate = categoryRepository.findAll().collectList().block().size();
         category.setId(count.incrementAndGet());
 
+        // Create the Category
+        CategoryDTO categoryDTO = categoryMapper.toDto(category);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         webTestClient
             .patch()
-            .uri(ENTITY_API_URL_ID, category.getId())
+            .uri(ENTITY_API_URL_ID, categoryDTO.getId())
             .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(TestUtil.convertObjectToJsonBytes(category))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(categoryDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -422,12 +444,15 @@ class CategoryResourceIT {
         int databaseSizeBeforeUpdate = categoryRepository.findAll().collectList().block().size();
         category.setId(count.incrementAndGet());
 
+        // Create the Category
+        CategoryDTO categoryDTO = categoryMapper.toDto(category);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .patch()
             .uri(ENTITY_API_URL_ID, count.incrementAndGet())
             .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(TestUtil.convertObjectToJsonBytes(category))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(categoryDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -442,12 +467,15 @@ class CategoryResourceIT {
         int databaseSizeBeforeUpdate = categoryRepository.findAll().collectList().block().size();
         category.setId(count.incrementAndGet());
 
+        // Create the Category
+        CategoryDTO categoryDTO = categoryMapper.toDto(category);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .patch()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(TestUtil.convertObjectToJsonBytes(category))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(categoryDTO))
             .exchange()
             .expectStatus()
             .isEqualTo(405);

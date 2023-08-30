@@ -21,7 +21,7 @@
       "name": "Name",
       "description": "Description",
       "status": "Status",
-      "product": "Product"
+      "products": "Products"
     }
   }
 }

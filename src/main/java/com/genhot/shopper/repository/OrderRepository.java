@@ -22,11 +22,11 @@ public interface OrderRepository extends ReactiveCrudRepository<Order, Long>, Or
     @Query("SELECT * FROM jhi_order entity WHERE entity.customer_id IS NULL")
     Flux<Order> findAllWhereCustomerIsNull();
 
-    @Query("SELECT * FROM jhi_order entity WHERE entity.delivery_id = :id")
-    Flux<Order> findByDelivery(Long id);
+    @Query("SELECT * FROM jhi_order entity WHERE entity.deliveries_id = :id")
+    Flux<Order> findByDeliveries(Long id);
 
-    @Query("SELECT * FROM jhi_order entity WHERE entity.delivery_id IS NULL")
-    Flux<Order> findAllWhereDeliveryIsNull();
+    @Query("SELECT * FROM jhi_order entity WHERE entity.deliveries_id IS NULL")
+    Flux<Order> findAllWhereDeliveriesIsNull();
 
     @Override
     <S extends Order> Mono<S> save(S entity);

@@ -29,7 +29,6 @@ public class CustomerRowMapper implements BiFunction<Row, String, Customer> {
         entity.setLastName(converter.fromRow(row, prefix + "_last_name", String.class));
         entity.setEmail(converter.fromRow(row, prefix + "_email", String.class));
         entity.setPhoneNumber(converter.fromRow(row, prefix + "_phone_number", String.class));
-        entity.setAddress(converter.fromRow(row, prefix + "_address", String.class));
         return entity;
     }
 }

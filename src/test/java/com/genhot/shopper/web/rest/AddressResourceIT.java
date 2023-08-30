@@ -8,6 +8,8 @@ import com.genhot.shopper.IntegrationTest;
 import com.genhot.shopper.domain.Address;
 import com.genhot.shopper.repository.AddressRepository;
 import com.genhot.shopper.repository.EntityManager;
+import com.genhot.shopper.service.dto.AddressDTO;
+import com.genhot.shopper.service.mapper.AddressMapper;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
@@ -51,6 +53,9 @@ class AddressResourceIT {
 
     @Autowired
     private AddressRepository addressRepository;
+
+    @Autowired
+    private AddressMapper addressMapper;
 
     @Autowired
     private EntityManager em;
@@ -115,11 +120,12 @@ class AddressResourceIT {
     void createAddress() throws Exception {
         int databaseSizeBeforeCreate = addressRepository.findAll().collectList().block().size();
         // Create the Address
+        AddressDTO addressDTO = addressMapper.toDto(address);
         webTestClient
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(address))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(addressDTO))
             .exchange()
             .expectStatus()
             .isCreated();
@@ -139,6 +145,7 @@ class AddressResourceIT {
     void createAddressWithExistingId() throws Exception {
         // Create the Address with an existing ID
         address.setId(1L);
+        AddressDTO addressDTO = addressMapper.toDto(address);
 
         int databaseSizeBeforeCreate = addressRepository.findAll().collectList().block().size();
 
@@ -147,7 +154,7 @@ class AddressResourceIT {
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(address))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(addressDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -244,12 +251,13 @@ class AddressResourceIT {
             .state(UPDATED_STATE)
             .zipcode(UPDATED_ZIPCODE)
             .country(UPDATED_COUNTRY);
+        AddressDTO addressDTO = addressMapper.toDto(updatedAddress);
 
         webTestClient
             .put()
-            .uri(ENTITY_API_URL_ID, updatedAddress.getId())
+            .uri(ENTITY_API_URL_ID, addressDTO.getId())
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(updatedAddress))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(addressDTO))
             .exchange()
             .expectStatus()
             .isOk();
@@ -270,12 +278,15 @@ class AddressResourceIT {
         int databaseSizeBeforeUpdate = addressRepository.findAll().collectList().block().size();
         address.setId(count.incrementAndGet());
 
+        // Create the Address
+        AddressDTO addressDTO = addressMapper.toDto(address);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         webTestClient
             .put()
-            .uri(ENTITY_API_URL_ID, address.getId())
+            .uri(ENTITY_API_URL_ID, addressDTO.getId())
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(address))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(addressDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -290,12 +301,15 @@ class AddressResourceIT {
         int databaseSizeBeforeUpdate = addressRepository.findAll().collectList().block().size();
         address.setId(count.incrementAndGet());
 
+        // Create the Address
+        AddressDTO addressDTO = addressMapper.toDto(address);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .put()
             .uri(ENTITY_API_URL_ID, count.incrementAndGet())
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(address))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(addressDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -310,12 +324,15 @@ class AddressResourceIT {
         int databaseSizeBeforeUpdate = addressRepository.findAll().collectList().block().size();
         address.setId(count.incrementAndGet());
 
+        // Create the Address
+        AddressDTO addressDTO = addressMapper.toDto(address);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .put()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(address))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(addressDTO))
             .exchange()
             .expectStatus()
             .isEqualTo(405);
@@ -401,12 +418,15 @@ class AddressResourceIT {
         int databaseSizeBeforeUpdate = addressRepository.findAll().collectList().block().size();
         address.setId(count.incrementAndGet());
 
+        // Create the Address
+        AddressDTO addressDTO = addressMapper.toDto(address);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         webTestClient
             .patch()
-            .uri(ENTITY_API_URL_ID, address.getId())
+            .uri(ENTITY_API_URL_ID, addressDTO.getId())
             .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(TestUtil.convertObjectToJsonBytes(address))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(addressDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -421,12 +441,15 @@ class AddressResourceIT {
         int databaseSizeBeforeUpdate = addressRepository.findAll().collectList().block().size();
         address.setId(count.incrementAndGet());
 
+        // Create the Address
+        AddressDTO addressDTO = addressMapper.toDto(address);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .patch()
             .uri(ENTITY_API_URL_ID, count.incrementAndGet())
             .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(TestUtil.convertObjectToJsonBytes(address))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(addressDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -441,12 +464,15 @@ class AddressResourceIT {
         int databaseSizeBeforeUpdate = addressRepository.findAll().collectList().block().size();
         address.setId(count.incrementAndGet());
 
+        // Create the Address
+        AddressDTO addressDTO = addressMapper.toDto(address);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .patch()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(TestUtil.convertObjectToJsonBytes(address))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(addressDTO))
             .exchange()
             .expectStatus()
             .isEqualTo(405);

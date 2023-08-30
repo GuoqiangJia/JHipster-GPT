@@ -8,6 +8,8 @@ import com.genhot.shopper.IntegrationTest;
 import com.genhot.shopper.domain.Delivery;
 import com.genhot.shopper.repository.DeliveryRepository;
 import com.genhot.shopper.repository.EntityManager;
+import com.genhot.shopper.service.dto.DeliveryDTO;
+import com.genhot.shopper.service.mapper.DeliveryMapper;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -47,6 +49,9 @@ class DeliveryResourceIT {
 
     @Autowired
     private DeliveryRepository deliveryRepository;
+
+    @Autowired
+    private DeliveryMapper deliveryMapper;
 
     @Autowired
     private EntityManager em;
@@ -107,11 +112,12 @@ class DeliveryResourceIT {
     void createDelivery() throws Exception {
         int databaseSizeBeforeCreate = deliveryRepository.findAll().collectList().block().size();
         // Create the Delivery
+        DeliveryDTO deliveryDTO = deliveryMapper.toDto(delivery);
         webTestClient
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(delivery))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(deliveryDTO))
             .exchange()
             .expectStatus()
             .isCreated();
@@ -129,6 +135,7 @@ class DeliveryResourceIT {
     void createDeliveryWithExistingId() throws Exception {
         // Create the Delivery with an existing ID
         delivery.setId(1L);
+        DeliveryDTO deliveryDTO = deliveryMapper.toDto(delivery);
 
         int databaseSizeBeforeCreate = deliveryRepository.findAll().collectList().block().size();
 
@@ -137,7 +144,7 @@ class DeliveryResourceIT {
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(delivery))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(deliveryDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -154,12 +161,13 @@ class DeliveryResourceIT {
         delivery.setTrackingNumber(null);
 
         // Create the Delivery, which fails.
+        DeliveryDTO deliveryDTO = deliveryMapper.toDto(delivery);
 
         webTestClient
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(delivery))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(deliveryDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -175,12 +183,13 @@ class DeliveryResourceIT {
         delivery.setCarrier(null);
 
         // Create the Delivery, which fails.
+        DeliveryDTO deliveryDTO = deliveryMapper.toDto(delivery);
 
         webTestClient
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(delivery))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(deliveryDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -196,12 +205,13 @@ class DeliveryResourceIT {
         delivery.setShippingDate(null);
 
         // Create the Delivery, which fails.
+        DeliveryDTO deliveryDTO = deliveryMapper.toDto(delivery);
 
         webTestClient
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(delivery))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(deliveryDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -284,12 +294,13 @@ class DeliveryResourceIT {
         // Update the delivery
         Delivery updatedDelivery = deliveryRepository.findById(delivery.getId()).block();
         updatedDelivery.trackingNumber(UPDATED_TRACKING_NUMBER).carrier(UPDATED_CARRIER).shippingDate(UPDATED_SHIPPING_DATE);
+        DeliveryDTO deliveryDTO = deliveryMapper.toDto(updatedDelivery);
 
         webTestClient
             .put()
-            .uri(ENTITY_API_URL_ID, updatedDelivery.getId())
+            .uri(ENTITY_API_URL_ID, deliveryDTO.getId())
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(updatedDelivery))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(deliveryDTO))
             .exchange()
             .expectStatus()
             .isOk();
@@ -308,12 +319,15 @@ class DeliveryResourceIT {
         int databaseSizeBeforeUpdate = deliveryRepository.findAll().collectList().block().size();
         delivery.setId(count.incrementAndGet());
 
+        // Create the Delivery
+        DeliveryDTO deliveryDTO = deliveryMapper.toDto(delivery);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         webTestClient
             .put()
-            .uri(ENTITY_API_URL_ID, delivery.getId())
+            .uri(ENTITY_API_URL_ID, deliveryDTO.getId())
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(delivery))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(deliveryDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -328,12 +342,15 @@ class DeliveryResourceIT {
         int databaseSizeBeforeUpdate = deliveryRepository.findAll().collectList().block().size();
         delivery.setId(count.incrementAndGet());
 
+        // Create the Delivery
+        DeliveryDTO deliveryDTO = deliveryMapper.toDto(delivery);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .put()
             .uri(ENTITY_API_URL_ID, count.incrementAndGet())
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(delivery))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(deliveryDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -348,12 +365,15 @@ class DeliveryResourceIT {
         int databaseSizeBeforeUpdate = deliveryRepository.findAll().collectList().block().size();
         delivery.setId(count.incrementAndGet());
 
+        // Create the Delivery
+        DeliveryDTO deliveryDTO = deliveryMapper.toDto(delivery);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .put()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(delivery))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(deliveryDTO))
             .exchange()
             .expectStatus()
             .isEqualTo(405);
@@ -428,12 +448,15 @@ class DeliveryResourceIT {
         int databaseSizeBeforeUpdate = deliveryRepository.findAll().collectList().block().size();
         delivery.setId(count.incrementAndGet());
 
+        // Create the Delivery
+        DeliveryDTO deliveryDTO = deliveryMapper.toDto(delivery);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         webTestClient
             .patch()
-            .uri(ENTITY_API_URL_ID, delivery.getId())
+            .uri(ENTITY_API_URL_ID, deliveryDTO.getId())
             .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(TestUtil.convertObjectToJsonBytes(delivery))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(deliveryDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -448,12 +471,15 @@ class DeliveryResourceIT {
         int databaseSizeBeforeUpdate = deliveryRepository.findAll().collectList().block().size();
         delivery.setId(count.incrementAndGet());
 
+        // Create the Delivery
+        DeliveryDTO deliveryDTO = deliveryMapper.toDto(delivery);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .patch()
             .uri(ENTITY_API_URL_ID, count.incrementAndGet())
             .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(TestUtil.convertObjectToJsonBytes(delivery))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(deliveryDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -468,12 +494,15 @@ class DeliveryResourceIT {
         int databaseSizeBeforeUpdate = deliveryRepository.findAll().collectList().block().size();
         delivery.setId(count.incrementAndGet());
 
+        // Create the Delivery
+        DeliveryDTO deliveryDTO = deliveryMapper.toDto(delivery);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .patch()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(TestUtil.convertObjectToJsonBytes(delivery))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(deliveryDTO))
             .exchange()
             .expectStatus()
             .isEqualTo(405);

@@ -8,7 +8,7 @@ export interface IProduct {
   price?: number;
   inventory?: number;
   categories?: ICategory[] | null;
-  order?: IOrder | null;
+  orders?: IOrder | null;
 }
 
 export const defaultValue: Readonly<IProduct> = {};

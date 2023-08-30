@@ -129,7 +129,7 @@ export const Order = () => {
                   <Translate contentKey="shopperApp.order.customer">Customer</Translate> <FontAwesomeIcon icon="sort" />
                 </th>
                 <th>
-                  <Translate contentKey="shopperApp.order.delivery">Delivery</Translate> <FontAwesomeIcon icon="sort" />
+                  <Translate contentKey="shopperApp.order.deliveries">Deliveries</Translate> <FontAwesomeIcon icon="sort" />
                 </th>
                 <th />
               </tr>
@@ -146,7 +146,7 @@ export const Order = () => {
                   <td>{order.status}</td>
                   <td>{order.totalPrice}</td>
                   <td>{order.customer ? <Link to={`/customer/${order.customer.id}`}>{order.customer.id}</Link> : ''}</td>
-                  <td>{order.delivery ? <Link to={`/delivery/${order.delivery.id}`}>{order.delivery.id}</Link> : ''}</td>
+                  <td>{order.deliveries ? <Link to={`/delivery/${order.deliveries.id}`}>{order.deliveries.id}</Link> : ''}</td>
                   <td className="text-end">
                     <div className="btn-group flex-btn-group-container">
                       <Button tag={Link} to={`/order/${order.id}`} color="info" size="sm" data-cy="entityDetailsButton">

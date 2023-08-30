@@ -1,7 +1,8 @@
 package com.genhot.shopper.web.rest;
 
-import com.genhot.shopper.domain.Delivery;
 import com.genhot.shopper.repository.DeliveryRepository;
+import com.genhot.shopper.service.DeliveryService;
+import com.genhot.shopper.service.dto.DeliveryDTO;
 import com.genhot.shopper.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -18,7 +19,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -32,7 +32,6 @@ import tech.jhipster.web.util.reactive.ResponseUtil;
  */
 @RestController
 @RequestMapping("/api")
-@Transactional
 public class DeliveryResource {
 
     private final Logger log = LoggerFactory.getLogger(DeliveryResource.class);
@@ -42,27 +41,30 @@ public class DeliveryResource {
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
+    private final DeliveryService deliveryService;
+
     private final DeliveryRepository deliveryRepository;
 
-    public DeliveryResource(DeliveryRepository deliveryRepository) {
+    public DeliveryResource(DeliveryService deliveryService, DeliveryRepository deliveryRepository) {
+        this.deliveryService = deliveryService;
         this.deliveryRepository = deliveryRepository;
     }
 
     /**
      * {@code POST  /deliveries} : Create a new delivery.
      *
-     * @param delivery the delivery to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new delivery, or with status {@code 400 (Bad Request)} if the delivery has already an ID.
+     * @param deliveryDTO the deliveryDTO to create.
+     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new deliveryDTO, or with status {@code 400 (Bad Request)} if the delivery has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/deliveries")
-    public Mono<ResponseEntity<Delivery>> createDelivery(@Valid @RequestBody Delivery delivery) throws URISyntaxException {
-        log.debug("REST request to save Delivery : {}", delivery);
-        if (delivery.getId() != null) {
+    public Mono<ResponseEntity<DeliveryDTO>> createDelivery(@Valid @RequestBody DeliveryDTO deliveryDTO) throws URISyntaxException {
+        log.debug("REST request to save Delivery : {}", deliveryDTO);
+        if (deliveryDTO.getId() != null) {
             throw new BadRequestAlertException("A new delivery cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        return deliveryRepository
-            .save(delivery)
+        return deliveryService
+            .save(deliveryDTO)
             .map(result -> {
                 try {
                     return ResponseEntity
@@ -78,23 +80,23 @@ public class DeliveryResource {
     /**
      * {@code PUT  /deliveries/:id} : Updates an existing delivery.
      *
-     * @param id the id of the delivery to save.
-     * @param delivery the delivery to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated delivery,
-     * or with status {@code 400 (Bad Request)} if the delivery is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the delivery couldn't be updated.
+     * @param id the id of the deliveryDTO to save.
+     * @param deliveryDTO the deliveryDTO to update.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated deliveryDTO,
+     * or with status {@code 400 (Bad Request)} if the deliveryDTO is not valid,
+     * or with status {@code 500 (Internal Server Error)} if the deliveryDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/deliveries/{id}")
-    public Mono<ResponseEntity<Delivery>> updateDelivery(
+    public Mono<ResponseEntity<DeliveryDTO>> updateDelivery(
         @PathVariable(value = "id", required = false) final Long id,
-        @Valid @RequestBody Delivery delivery
+        @Valid @RequestBody DeliveryDTO deliveryDTO
     ) throws URISyntaxException {
-        log.debug("REST request to update Delivery : {}, {}", id, delivery);
-        if (delivery.getId() == null) {
+        log.debug("REST request to update Delivery : {}, {}", id, deliveryDTO);
+        if (deliveryDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        if (!Objects.equals(id, delivery.getId())) {
+        if (!Objects.equals(id, deliveryDTO.getId())) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
@@ -105,8 +107,8 @@ public class DeliveryResource {
                     return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
                 }
 
-                return deliveryRepository
-                    .save(delivery)
+                return deliveryService
+                    .update(deliveryDTO)
                     .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
                     .map(result ->
                         ResponseEntity
@@ -120,24 +122,24 @@ public class DeliveryResource {
     /**
      * {@code PATCH  /deliveries/:id} : Partial updates given fields of an existing delivery, field will ignore if it is null
      *
-     * @param id the id of the delivery to save.
-     * @param delivery the delivery to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated delivery,
-     * or with status {@code 400 (Bad Request)} if the delivery is not valid,
-     * or with status {@code 404 (Not Found)} if the delivery is not found,
-     * or with status {@code 500 (Internal Server Error)} if the delivery couldn't be updated.
+     * @param id the id of the deliveryDTO to save.
+     * @param deliveryDTO the deliveryDTO to update.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated deliveryDTO,
+     * or with status {@code 400 (Bad Request)} if the deliveryDTO is not valid,
+     * or with status {@code 404 (Not Found)} if the deliveryDTO is not found,
+     * or with status {@code 500 (Internal Server Error)} if the deliveryDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/deliveries/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    public Mono<ResponseEntity<Delivery>> partialUpdateDelivery(
+    public Mono<ResponseEntity<DeliveryDTO>> partialUpdateDelivery(
         @PathVariable(value = "id", required = false) final Long id,
-        @NotNull @RequestBody Delivery delivery
+        @NotNull @RequestBody DeliveryDTO deliveryDTO
     ) throws URISyntaxException {
-        log.debug("REST request to partial update Delivery partially : {}, {}", id, delivery);
-        if (delivery.getId() == null) {
+        log.debug("REST request to partial update Delivery partially : {}, {}", id, deliveryDTO);
+        if (deliveryDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        if (!Objects.equals(id, delivery.getId())) {
+        if (!Objects.equals(id, deliveryDTO.getId())) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
@@ -148,22 +150,7 @@ public class DeliveryResource {
                     return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
                 }
 
-                Mono<Delivery> result = deliveryRepository
-                    .findById(delivery.getId())
-                    .map(existingDelivery -> {
-                        if (delivery.getTrackingNumber() != null) {
-                            existingDelivery.setTrackingNumber(delivery.getTrackingNumber());
-                        }
-                        if (delivery.getCarrier() != null) {
-                            existingDelivery.setCarrier(delivery.getCarrier());
-                        }
-                        if (delivery.getShippingDate() != null) {
-                            existingDelivery.setShippingDate(delivery.getShippingDate());
-                        }
-
-                        return existingDelivery;
-                    })
-                    .flatMap(deliveryRepository::save);
+                Mono<DeliveryDTO> result = deliveryService.partialUpdate(deliveryDTO);
 
                 return result
                     .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
@@ -184,14 +171,14 @@ public class DeliveryResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of deliveries in body.
      */
     @GetMapping(value = "/deliveries", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<List<Delivery>>> getAllDeliveries(
+    public Mono<ResponseEntity<List<DeliveryDTO>>> getAllDeliveries(
         @org.springdoc.core.annotations.ParameterObject Pageable pageable,
         ServerHttpRequest request
     ) {
         log.debug("REST request to get a page of Deliveries");
-        return deliveryRepository
-            .count()
-            .zipWith(deliveryRepository.findAllBy(pageable).collectList())
+        return deliveryService
+            .countAll()
+            .zipWith(deliveryService.findAll(pageable).collectList())
             .map(countWithEntities ->
                 ResponseEntity
                     .ok()
@@ -208,27 +195,27 @@ public class DeliveryResource {
     /**
      * {@code GET  /deliveries/:id} : get the "id" delivery.
      *
-     * @param id the id of the delivery to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the delivery, or with status {@code 404 (Not Found)}.
+     * @param id the id of the deliveryDTO to retrieve.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the deliveryDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/deliveries/{id}")
-    public Mono<ResponseEntity<Delivery>> getDelivery(@PathVariable Long id) {
+    public Mono<ResponseEntity<DeliveryDTO>> getDelivery(@PathVariable Long id) {
         log.debug("REST request to get Delivery : {}", id);
-        Mono<Delivery> delivery = deliveryRepository.findById(id);
-        return ResponseUtil.wrapOrNotFound(delivery);
+        Mono<DeliveryDTO> deliveryDTO = deliveryService.findOne(id);
+        return ResponseUtil.wrapOrNotFound(deliveryDTO);
     }
 
     /**
      * {@code DELETE  /deliveries/:id} : delete the "id" delivery.
      *
-     * @param id the id of the delivery to delete.
+     * @param id the id of the deliveryDTO to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/deliveries/{id}")
     public Mono<ResponseEntity<Void>> deleteDelivery(@PathVariable Long id) {
         log.debug("REST request to delete Delivery : {}", id);
-        return deliveryRepository
-            .deleteById(id)
+        return deliveryService
+            .delete(id)
             .then(
                 Mono.just(
                     ResponseEntity

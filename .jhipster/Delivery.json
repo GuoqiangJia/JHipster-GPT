@@ -1,6 +1,7 @@
 {
   "applications": ["shopper"],
-  "changelogDate": "20230816024353",
+  "changelogDate": "20230828062548",
+  "dto": "mapstruct",
   "entityTableName": "delivery",
   "fields": [
     {
@@ -24,11 +25,12 @@
   "relationships": [
     {
       "otherEntityName": "order",
-      "otherEntityRelationshipName": "delivery",
-      "relationshipName": "order",
+      "otherEntityRelationshipName": "deliveries",
+      "relationshipName": "orders",
       "relationshipSide": "left",
       "relationshipType": "one-to-many"
     }
   ],
-  "searchEngine": "no"
+  "searchEngine": "no",
+  "service": "serviceImpl"
 }

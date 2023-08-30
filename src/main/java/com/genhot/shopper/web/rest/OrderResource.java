@@ -1,7 +1,8 @@
 package com.genhot.shopper.web.rest;
 
-import com.genhot.shopper.domain.Order;
 import com.genhot.shopper.repository.OrderRepository;
+import com.genhot.shopper.service.OrderService;
+import com.genhot.shopper.service.dto.OrderDTO;
 import com.genhot.shopper.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -18,7 +19,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -32,7 +32,6 @@ import tech.jhipster.web.util.reactive.ResponseUtil;
  */
 @RestController
 @RequestMapping("/api")
-@Transactional
 public class OrderResource {
 
     private final Logger log = LoggerFactory.getLogger(OrderResource.class);
@@ -42,27 +41,32 @@ public class OrderResource {
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
+    private final OrderService orderService;
+
     private final OrderRepository orderRepository;
 
-    public OrderResource(OrderRepository orderRepository) {
+    public OrderResource(OrderService orderService, OrderRepository orderRepository) {
+        this.orderService = orderService;
         this.orderRepository = orderRepository;
     }
 
     /**
      * {@code POST  /orders} : Create a new order.
      *
-     * @param order the order to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new order, or with status {@code 400 (Bad Request)} if the order has already an ID.
+     * @param orderDTO the orderDTO to create.
+     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with
+     *         body the new orderDTO, or with status {@code 400 (Bad Request)} if
+     *         the order has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/orders")
-    public Mono<ResponseEntity<Order>> createOrder(@Valid @RequestBody Order order) throws URISyntaxException {
-        log.debug("REST request to save Order : {}", order);
-        if (order.getId() != null) {
+    public Mono<ResponseEntity<OrderDTO>> createOrder(@Valid @RequestBody OrderDTO orderDTO) throws URISyntaxException {
+        log.debug("REST request to save Order : {}", orderDTO);
+        if (orderDTO.getId() != null) {
             throw new BadRequestAlertException("A new order cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        return orderRepository
-            .save(order)
+        return orderService
+            .save(orderDTO)
             .map(result -> {
                 try {
                     return ResponseEntity
@@ -78,23 +82,26 @@ public class OrderResource {
     /**
      * {@code PUT  /orders/:id} : Updates an existing order.
      *
-     * @param id the id of the order to save.
-     * @param order the order to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated order,
-     * or with status {@code 400 (Bad Request)} if the order is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the order couldn't be updated.
+     * @param id       the id of the orderDTO to save.
+     * @param orderDTO the orderDTO to update.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
+     *         the updated orderDTO,
+     *         or with status {@code 400 (Bad Request)} if the orderDTO is not
+     *         valid,
+     *         or with status {@code 500 (Internal Server Error)} if the orderDTO
+     *         couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/orders/{id}")
-    public Mono<ResponseEntity<Order>> updateOrder(
+    public Mono<ResponseEntity<OrderDTO>> updateOrder(
         @PathVariable(value = "id", required = false) final Long id,
-        @Valid @RequestBody Order order
+        @Valid @RequestBody OrderDTO orderDTO
     ) throws URISyntaxException {
-        log.debug("REST request to update Order : {}, {}", id, order);
-        if (order.getId() == null) {
+        log.debug("REST request to update Order : {}, {}", id, orderDTO);
+        if (orderDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        if (!Objects.equals(id, order.getId())) {
+        if (!Objects.equals(id, orderDTO.getId())) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
@@ -105,8 +112,8 @@ public class OrderResource {
                     return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
                 }
 
-                return orderRepository
-                    .save(order)
+                return orderService
+                    .update(orderDTO)
                     .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
                     .map(result ->
                         ResponseEntity
@@ -118,26 +125,30 @@ public class OrderResource {
     }
 
     /**
-     * {@code PATCH  /orders/:id} : Partial updates given fields of an existing order, field will ignore if it is null
+     * {@code PATCH  /orders/:id} : Partial updates given fields of an existing
+     * order, field will ignore if it is null
      *
-     * @param id the id of the order to save.
-     * @param order the order to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated order,
-     * or with status {@code 400 (Bad Request)} if the order is not valid,
-     * or with status {@code 404 (Not Found)} if the order is not found,
-     * or with status {@code 500 (Internal Server Error)} if the order couldn't be updated.
+     * @param id       the id of the orderDTO to save.
+     * @param orderDTO the orderDTO to update.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
+     *         the updated orderDTO,
+     *         or with status {@code 400 (Bad Request)} if the orderDTO is not
+     *         valid,
+     *         or with status {@code 404 (Not Found)} if the orderDTO is not found,
+     *         or with status {@code 500 (Internal Server Error)} if the orderDTO
+     *         couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/orders/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    public Mono<ResponseEntity<Order>> partialUpdateOrder(
+    public Mono<ResponseEntity<OrderDTO>> partialUpdateOrder(
         @PathVariable(value = "id", required = false) final Long id,
-        @NotNull @RequestBody Order order
+        @NotNull @RequestBody OrderDTO orderDTO
     ) throws URISyntaxException {
-        log.debug("REST request to partial update Order partially : {}, {}", id, order);
-        if (order.getId() == null) {
+        log.debug("REST request to partial update Order partially : {}, {}", id, orderDTO);
+        if (orderDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        if (!Objects.equals(id, order.getId())) {
+        if (!Objects.equals(id, orderDTO.getId())) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
@@ -148,22 +159,7 @@ public class OrderResource {
                     return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
                 }
 
-                Mono<Order> result = orderRepository
-                    .findById(order.getId())
-                    .map(existingOrder -> {
-                        if (order.getDate() != null) {
-                            existingOrder.setDate(order.getDate());
-                        }
-                        if (order.getStatus() != null) {
-                            existingOrder.setStatus(order.getStatus());
-                        }
-                        if (order.getTotalPrice() != null) {
-                            existingOrder.setTotalPrice(order.getTotalPrice());
-                        }
-
-                        return existingOrder;
-                    })
-                    .flatMap(orderRepository::save);
+                Mono<OrderDTO> result = orderService.partialUpdate(orderDTO);
 
                 return result
                     .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
@@ -180,18 +176,19 @@ public class OrderResource {
      * {@code GET  /orders} : get all the orders.
      *
      * @param pageable the pagination information.
-     * @param request a {@link ServerHttpRequest} request.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of orders in body.
+     * @param request  a {@link ServerHttpRequest} request.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list
+     *         of orders in body.
      */
     @GetMapping(value = "/orders", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<List<Order>>> getAllOrders(
+    public Mono<ResponseEntity<List<OrderDTO>>> getAllOrders(
         @org.springdoc.core.annotations.ParameterObject Pageable pageable,
         ServerHttpRequest request
     ) {
         log.debug("REST request to get a page of Orders");
-        return orderRepository
-            .count()
-            .zipWith(orderRepository.findAllBy(pageable).collectList())
+        return orderService
+            .countAll()
+            .zipWith(orderService.findAll(pageable).collectList())
             .map(countWithEntities ->
                 ResponseEntity
                     .ok()
@@ -208,27 +205,28 @@ public class OrderResource {
     /**
      * {@code GET  /orders/:id} : get the "id" order.
      *
-     * @param id the id of the order to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the order, or with status {@code 404 (Not Found)}.
+     * @param id the id of the orderDTO to retrieve.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
+     *         the orderDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/orders/{id}")
-    public Mono<ResponseEntity<Order>> getOrder(@PathVariable Long id) {
+    public Mono<ResponseEntity<OrderDTO>> getOrder(@PathVariable Long id) {
         log.debug("REST request to get Order : {}", id);
-        Mono<Order> order = orderRepository.findById(id);
-        return ResponseUtil.wrapOrNotFound(order);
+        Mono<OrderDTO> orderDTO = orderService.findOne(id);
+        return ResponseUtil.wrapOrNotFound(orderDTO);
     }
 
     /**
      * {@code DELETE  /orders/:id} : delete the "id" order.
      *
-     * @param id the id of the order to delete.
+     * @param id the id of the orderDTO to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/orders/{id}")
     public Mono<ResponseEntity<Void>> deleteOrder(@PathVariable Long id) {
         log.debug("REST request to delete Order : {}", id);
-        return orderRepository
-            .deleteById(id)
+        return orderService
+            .delete(id)
             .then(
                 Mono.just(
                     ResponseEntity

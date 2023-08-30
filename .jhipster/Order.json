@@ -1,6 +1,7 @@
 {
   "applications": ["shopper"],
-  "changelogDate": "20230816024352",
+  "changelogDate": "20230828062547",
+  "dto": "mapstruct",
   "entityTableName": "jhi_order",
   "fields": [
     {
@@ -15,7 +16,7 @@
     },
     {
       "fieldName": "totalPrice",
-      "fieldType": "BigDecimal",
+      "fieldType": "Double",
       "fieldValidateRules": ["required"]
     }
   ],
@@ -24,25 +25,26 @@
   "relationships": [
     {
       "otherEntityName": "product",
-      "otherEntityRelationshipName": "order",
-      "relationshipName": "product",
+      "otherEntityRelationshipName": "orders",
+      "relationshipName": "products",
       "relationshipSide": "left",
       "relationshipType": "one-to-many"
     },
     {
       "otherEntityName": "customer",
-      "otherEntityRelationshipName": "order",
+      "otherEntityRelationshipName": "orders",
       "relationshipName": "customer",
       "relationshipSide": "right",
       "relationshipType": "many-to-one"
     },
     {
       "otherEntityName": "delivery",
-      "otherEntityRelationshipName": "order",
-      "relationshipName": "delivery",
+      "otherEntityRelationshipName": "orders",
+      "relationshipName": "deliveries",
       "relationshipSide": "right",
       "relationshipType": "many-to-one"
     }
   ],
-  "searchEngine": "no"
+  "searchEngine": "no",
+  "service": "serviceImpl"
 }

@@ -129,10 +129,6 @@ export const Customer = () => {
                   <Translate contentKey="shopperApp.customer.phoneNumber">Phone Number</Translate>{' '}
                   <FontAwesomeIcon icon={getSortIconByFieldName('phoneNumber')} />
                 </th>
-                <th className="hand" onClick={sort('address')}>
-                  <Translate contentKey="shopperApp.customer.address">Address</Translate>{' '}
-                  <FontAwesomeIcon icon={getSortIconByFieldName('address')} />
-                </th>
                 <th />
               </tr>
             </thead>
@@ -148,7 +144,6 @@ export const Customer = () => {
                   <td>{customer.lastName}</td>
                   <td>{customer.email}</td>
                   <td>{customer.phoneNumber}</td>
-                  <td>{customer.address}</td>
                   <td className="text-end">
                     <div className="btn-group flex-btn-group-container">
                       <Button tag={Link} to={`/customer/${customer.id}`} color="info" size="sm" data-cy="entityDetailsButton">

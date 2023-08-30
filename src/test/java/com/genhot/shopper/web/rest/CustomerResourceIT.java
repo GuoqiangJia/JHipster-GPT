@@ -8,6 +8,8 @@ import com.genhot.shopper.IntegrationTest;
 import com.genhot.shopper.domain.Customer;
 import com.genhot.shopper.repository.CustomerRepository;
 import com.genhot.shopper.repository.EntityManager;
+import com.genhot.shopper.service.dto.CustomerDTO;
+import com.genhot.shopper.service.mapper.CustomerMapper;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
@@ -40,9 +42,6 @@ class CustomerResourceIT {
     private static final String DEFAULT_PHONE_NUMBER = "AAAAAAAAAA";
     private static final String UPDATED_PHONE_NUMBER = "BBBBBBBBBB";
 
-    private static final String DEFAULT_ADDRESS = "AAAAAAAAAA";
-    private static final String UPDATED_ADDRESS = "BBBBBBBBBB";
-
     private static final String ENTITY_API_URL = "/api/customers";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
@@ -51,6 +50,9 @@ class CustomerResourceIT {
 
     @Autowired
     private CustomerRepository customerRepository;
+
+    @Autowired
+    private CustomerMapper customerMapper;
 
     @Autowired
     private EntityManager em;
@@ -71,8 +73,7 @@ class CustomerResourceIT {
             .firstName(DEFAULT_FIRST_NAME)
             .lastName(DEFAULT_LAST_NAME)
             .email(DEFAULT_EMAIL)
-            .phoneNumber(DEFAULT_PHONE_NUMBER)
-            .address(DEFAULT_ADDRESS);
+            .phoneNumber(DEFAULT_PHONE_NUMBER);
         return customer;
     }
 
@@ -87,8 +88,7 @@ class CustomerResourceIT {
             .firstName(UPDATED_FIRST_NAME)
             .lastName(UPDATED_LAST_NAME)
             .email(UPDATED_EMAIL)
-            .phoneNumber(UPDATED_PHONE_NUMBER)
-            .address(UPDATED_ADDRESS);
+            .phoneNumber(UPDATED_PHONE_NUMBER);
         return customer;
     }
 
@@ -115,11 +115,12 @@ class CustomerResourceIT {
     void createCustomer() throws Exception {
         int databaseSizeBeforeCreate = customerRepository.findAll().collectList().block().size();
         // Create the Customer
+        CustomerDTO customerDTO = customerMapper.toDto(customer);
         webTestClient
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(customer))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(customerDTO))
             .exchange()
             .expectStatus()
             .isCreated();
@@ -132,13 +133,13 @@ class CustomerResourceIT {
         assertThat(testCustomer.getLastName()).isEqualTo(DEFAULT_LAST_NAME);
         assertThat(testCustomer.getEmail()).isEqualTo(DEFAULT_EMAIL);
         assertThat(testCustomer.getPhoneNumber()).isEqualTo(DEFAULT_PHONE_NUMBER);
-        assertThat(testCustomer.getAddress()).isEqualTo(DEFAULT_ADDRESS);
     }
 
     @Test
     void createCustomerWithExistingId() throws Exception {
         // Create the Customer with an existing ID
         customer.setId(1L);
+        CustomerDTO customerDTO = customerMapper.toDto(customer);
 
         int databaseSizeBeforeCreate = customerRepository.findAll().collectList().block().size();
 
@@ -147,7 +148,7 @@ class CustomerResourceIT {
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(customer))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(customerDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -164,12 +165,13 @@ class CustomerResourceIT {
         customer.setFirstName(null);
 
         // Create the Customer, which fails.
+        CustomerDTO customerDTO = customerMapper.toDto(customer);
 
         webTestClient
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(customer))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(customerDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -185,12 +187,13 @@ class CustomerResourceIT {
         customer.setLastName(null);
 
         // Create the Customer, which fails.
+        CustomerDTO customerDTO = customerMapper.toDto(customer);
 
         webTestClient
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(customer))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(customerDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -206,12 +209,13 @@ class CustomerResourceIT {
         customer.setEmail(null);
 
         // Create the Customer, which fails.
+        CustomerDTO customerDTO = customerMapper.toDto(customer);
 
         webTestClient
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(customer))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(customerDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -245,9 +249,7 @@ class CustomerResourceIT {
             .jsonPath("$.[*].email")
             .value(hasItem(DEFAULT_EMAIL))
             .jsonPath("$.[*].phoneNumber")
-            .value(hasItem(DEFAULT_PHONE_NUMBER))
-            .jsonPath("$.[*].address")
-            .value(hasItem(DEFAULT_ADDRESS));
+            .value(hasItem(DEFAULT_PHONE_NUMBER));
     }
 
     @Test
@@ -275,9 +277,7 @@ class CustomerResourceIT {
             .jsonPath("$.email")
             .value(is(DEFAULT_EMAIL))
             .jsonPath("$.phoneNumber")
-            .value(is(DEFAULT_PHONE_NUMBER))
-            .jsonPath("$.address")
-            .value(is(DEFAULT_ADDRESS));
+            .value(is(DEFAULT_PHONE_NUMBER));
     }
 
     @Test
@@ -301,18 +301,14 @@ class CustomerResourceIT {
 
         // Update the customer
         Customer updatedCustomer = customerRepository.findById(customer.getId()).block();
-        updatedCustomer
-            .firstName(UPDATED_FIRST_NAME)
-            .lastName(UPDATED_LAST_NAME)
-            .email(UPDATED_EMAIL)
-            .phoneNumber(UPDATED_PHONE_NUMBER)
-            .address(UPDATED_ADDRESS);
+        updatedCustomer.firstName(UPDATED_FIRST_NAME).lastName(UPDATED_LAST_NAME).email(UPDATED_EMAIL).phoneNumber(UPDATED_PHONE_NUMBER);
+        CustomerDTO customerDTO = customerMapper.toDto(updatedCustomer);
 
         webTestClient
             .put()
-            .uri(ENTITY_API_URL_ID, updatedCustomer.getId())
+            .uri(ENTITY_API_URL_ID, customerDTO.getId())
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(updatedCustomer))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(customerDTO))
             .exchange()
             .expectStatus()
             .isOk();
@@ -325,7 +321,6 @@ class CustomerResourceIT {
         assertThat(testCustomer.getLastName()).isEqualTo(UPDATED_LAST_NAME);
         assertThat(testCustomer.getEmail()).isEqualTo(UPDATED_EMAIL);
         assertThat(testCustomer.getPhoneNumber()).isEqualTo(UPDATED_PHONE_NUMBER);
-        assertThat(testCustomer.getAddress()).isEqualTo(UPDATED_ADDRESS);
     }
 
     @Test
@@ -333,12 +328,15 @@ class CustomerResourceIT {
         int databaseSizeBeforeUpdate = customerRepository.findAll().collectList().block().size();
         customer.setId(count.incrementAndGet());
 
+        // Create the Customer
+        CustomerDTO customerDTO = customerMapper.toDto(customer);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         webTestClient
             .put()
-            .uri(ENTITY_API_URL_ID, customer.getId())
+            .uri(ENTITY_API_URL_ID, customerDTO.getId())
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(customer))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(customerDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -353,12 +351,15 @@ class CustomerResourceIT {
         int databaseSizeBeforeUpdate = customerRepository.findAll().collectList().block().size();
         customer.setId(count.incrementAndGet());
 
+        // Create the Customer
+        CustomerDTO customerDTO = customerMapper.toDto(customer);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .put()
             .uri(ENTITY_API_URL_ID, count.incrementAndGet())
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(customer))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(customerDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -373,12 +374,15 @@ class CustomerResourceIT {
         int databaseSizeBeforeUpdate = customerRepository.findAll().collectList().block().size();
         customer.setId(count.incrementAndGet());
 
+        // Create the Customer
+        CustomerDTO customerDTO = customerMapper.toDto(customer);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .put()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(customer))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(customerDTO))
             .exchange()
             .expectStatus()
             .isEqualTo(405);
@@ -399,7 +403,7 @@ class CustomerResourceIT {
         Customer partialUpdatedCustomer = new Customer();
         partialUpdatedCustomer.setId(customer.getId());
 
-        partialUpdatedCustomer.email(UPDATED_EMAIL).address(UPDATED_ADDRESS);
+        partialUpdatedCustomer.email(UPDATED_EMAIL);
 
         webTestClient
             .patch()
@@ -418,7 +422,6 @@ class CustomerResourceIT {
         assertThat(testCustomer.getLastName()).isEqualTo(DEFAULT_LAST_NAME);
         assertThat(testCustomer.getEmail()).isEqualTo(UPDATED_EMAIL);
         assertThat(testCustomer.getPhoneNumber()).isEqualTo(DEFAULT_PHONE_NUMBER);
-        assertThat(testCustomer.getAddress()).isEqualTo(UPDATED_ADDRESS);
     }
 
     @Test
@@ -436,8 +439,7 @@ class CustomerResourceIT {
             .firstName(UPDATED_FIRST_NAME)
             .lastName(UPDATED_LAST_NAME)
             .email(UPDATED_EMAIL)
-            .phoneNumber(UPDATED_PHONE_NUMBER)
-            .address(UPDATED_ADDRESS);
+            .phoneNumber(UPDATED_PHONE_NUMBER);
 
         webTestClient
             .patch()
@@ -456,7 +458,6 @@ class CustomerResourceIT {
         assertThat(testCustomer.getLastName()).isEqualTo(UPDATED_LAST_NAME);
         assertThat(testCustomer.getEmail()).isEqualTo(UPDATED_EMAIL);
         assertThat(testCustomer.getPhoneNumber()).isEqualTo(UPDATED_PHONE_NUMBER);
-        assertThat(testCustomer.getAddress()).isEqualTo(UPDATED_ADDRESS);
     }
 
     @Test
@@ -464,12 +465,15 @@ class CustomerResourceIT {
         int databaseSizeBeforeUpdate = customerRepository.findAll().collectList().block().size();
         customer.setId(count.incrementAndGet());
 
+        // Create the Customer
+        CustomerDTO customerDTO = customerMapper.toDto(customer);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         webTestClient
             .patch()
-            .uri(ENTITY_API_URL_ID, customer.getId())
+            .uri(ENTITY_API_URL_ID, customerDTO.getId())
             .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(TestUtil.convertObjectToJsonBytes(customer))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(customerDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -484,12 +488,15 @@ class CustomerResourceIT {
         int databaseSizeBeforeUpdate = customerRepository.findAll().collectList().block().size();
         customer.setId(count.incrementAndGet());
 
+        // Create the Customer
+        CustomerDTO customerDTO = customerMapper.toDto(customer);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .patch()
             .uri(ENTITY_API_URL_ID, count.incrementAndGet())
             .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(TestUtil.convertObjectToJsonBytes(customer))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(customerDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -504,12 +511,15 @@ class CustomerResourceIT {
         int databaseSizeBeforeUpdate = customerRepository.findAll().collectList().block().size();
         customer.setId(count.incrementAndGet());
 
+        // Create the Customer
+        CustomerDTO customerDTO = customerMapper.toDto(customer);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .patch()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(TestUtil.convertObjectToJsonBytes(customer))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(customerDTO))
             .exchange()
             .expectStatus()
             .isEqualTo(405);

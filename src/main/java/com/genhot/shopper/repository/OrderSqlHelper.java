@@ -16,7 +16,7 @@ public class OrderSqlHelper {
         columns.add(Column.aliased("total_price", table, columnPrefix + "_total_price"));
 
         columns.add(Column.aliased("customer_id", table, columnPrefix + "_customer_id"));
-        columns.add(Column.aliased("delivery_id", table, columnPrefix + "_delivery_id"));
+        columns.add(Column.aliased("deliveries_id", table, columnPrefix + "_deliveries_id"));
         return columns;
     }
 }

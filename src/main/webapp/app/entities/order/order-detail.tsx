@@ -55,9 +55,9 @@ export const OrderDetail = () => {
           </dt>
           <dd>{orderEntity.customer ? orderEntity.customer.id : ''}</dd>
           <dt>
-            <Translate contentKey="shopperApp.order.delivery">Delivery</Translate>
+            <Translate contentKey="shopperApp.order.deliveries">Deliveries</Translate>
           </dt>
-          <dd>{orderEntity.delivery ? orderEntity.delivery.id : ''}</dd>
+          <dd>{orderEntity.deliveries ? orderEntity.deliveries.id : ''}</dd>
         </dl>
         <Button tag={Link} to="/order" replace color="info" data-cy="entityDetailsBackButton">
           <FontAwesomeIcon icon="arrow-left" />{' '}

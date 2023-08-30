@@ -1,6 +1,7 @@
 {
   "applications": ["shopper"],
-  "changelogDate": "20230816024349",
+  "changelogDate": "20230828062544",
+  "dto": "mapstruct",
   "entityTableName": "category",
   "fields": [
     {
@@ -24,11 +25,12 @@
   "relationships": [
     {
       "otherEntityName": "product",
-      "otherEntityRelationshipName": "category",
-      "relationshipName": "product",
+      "otherEntityRelationshipName": "categories",
+      "relationshipName": "products",
       "relationshipSide": "right",
       "relationshipType": "many-to-many"
     }
   ],
-  "searchEngine": "no"
+  "searchEngine": "no",
+  "service": "serviceImpl"
 }

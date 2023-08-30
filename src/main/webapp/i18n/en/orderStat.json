@@ -1,0 +1,20 @@
+{
+  "shopperApp": {
+    "orderStat": {
+      "home": {
+        "title": "Order Stats",
+        "refreshListLabel": "Refresh list",
+        "notFound": "No Order Stats found"
+      },
+      "detail": {
+        "title": "Order Stat"
+      },
+      "id": "ID",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "totalCost": "Total Cost",
+      "type": "Type",
+      "email": "Email"
+    }
+  }
+}

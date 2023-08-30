@@ -37,7 +37,7 @@ public class Delivery implements Serializable {
     private Instant shippingDate;
 
     @Transient
-    @JsonIgnoreProperties(value = { "products", "customer", "delivery" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "products", "customer", "deliveries" }, allowSetters = true)
     private Set<Order> orders = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -100,10 +100,10 @@ public class Delivery implements Serializable {
 
     public void setOrders(Set<Order> orders) {
         if (this.orders != null) {
-            this.orders.forEach(i -> i.setDelivery(null));
+            this.orders.forEach(i -> i.setDeliveries(null));
         }
         if (orders != null) {
-            orders.forEach(i -> i.setDelivery(this));
+            orders.forEach(i -> i.setDeliveries(this));
         }
         this.orders = orders;
     }
@@ -113,15 +113,15 @@ public class Delivery implements Serializable {
         return this;
     }
 
-    public Delivery addOrder(Order order) {
+    public Delivery addOrders(Order order) {
         this.orders.add(order);
-        order.setDelivery(this);
+        order.setDeliveries(this);
         return this;
     }
 
-    public Delivery removeOrder(Order order) {
+    public Delivery removeOrders(Order order) {
         this.orders.remove(order);
-        order.setDelivery(null);
+        order.setDeliveries(null);
         return this;
     }
 

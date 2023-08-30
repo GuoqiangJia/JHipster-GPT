@@ -1,6 +1,7 @@
 {
   "applications": ["shopper"],
-  "changelogDate": "20230816024348",
+  "changelogDate": "20230828062543",
+  "dto": "mapstruct",
   "entityTableName": "product",
   "fields": [
     {
@@ -14,7 +15,7 @@
     },
     {
       "fieldName": "price",
-      "fieldType": "BigDecimal",
+      "fieldType": "Double",
       "fieldValidateRules": ["required"]
     },
     {
@@ -29,18 +30,19 @@
     {
       "otherEntityField": "name",
       "otherEntityName": "category",
-      "otherEntityRelationshipName": "product",
-      "relationshipName": "category",
+      "otherEntityRelationshipName": "products",
+      "relationshipName": "categories",
       "relationshipSide": "left",
       "relationshipType": "many-to-many"
     },
     {
       "otherEntityName": "order",
-      "otherEntityRelationshipName": "product",
-      "relationshipName": "order",
+      "otherEntityRelationshipName": "products",
+      "relationshipName": "orders",
       "relationshipSide": "right",
       "relationshipType": "many-to-one"
     }
   ],
-  "searchEngine": "no"
+  "searchEngine": "no",
+  "service": "serviceImpl"
 }
