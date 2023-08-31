@@ -9,7 +9,7 @@ else
     echo "File not found: $file_path"
 fi
 
-content="$content"\r\n
+content="$content\n"
 echo "$content"
 
 echo "Please input your prompt template path:"
@@ -29,6 +29,9 @@ if [[ -n "$requirements_line" && -n "$goals_line" ]]; then
     goals_line=$((goals_line - 1))
 
     sed -i "${requirements_line},${goals_line}d" "$tempfile"
+    echo "$tempfile"
+    content=$(echo "$content" | sed ':a;N;$!ba;s/\n/\\n/g')
+    echo "$content"
     sed -i "${requirements_line}i $content" "$tempfile"
 
     outname="generated-$(date +%Y%m%d-%H%M%S).md"
