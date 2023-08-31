@@ -1,9 +1,16 @@
 #!/bin/bash
 
 echo "Please input your requirements:"
-read -r content
-content="$content"$'\r\n'$'\r\n'
-echo $content
+read -r file_path
+
+if [ -f "$file_path" ]; then
+    content=$(cat "$file_path")
+else
+    echo "File not found: $file_path"
+fi
+
+content="$content"\r\n
+echo "$content"
 
 echo "Please input your prompt template path:"
 read -r template  
