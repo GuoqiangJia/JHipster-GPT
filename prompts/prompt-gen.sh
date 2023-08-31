@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Please input your requirements:"
+echo "Please input your requirements file path:"
 read -r file_path
 
 if [ -f "$file_path" ]; then
@@ -12,9 +12,9 @@ fi
 content="$content\n"
 echo "$content"
 
-echo "Please input your prompt template path:"
-read -r template  
-
+# echo "Please input your prompt template path:"
+# read -r template  
+template=./prompt-template-crud-v1.md
 tempfile=./generated-tmp.md
 cp "$template" "$tempfile"
 
